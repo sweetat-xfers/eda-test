@@ -25,33 +25,42 @@ services:
             - my-vendor:/xfers/vendor
             - my-node_modules:/xfers/node_modules
         environment:
-            DB_HOST: mysql
-            DB_PORT: 3306
-            DB_NAME: edatest
-            DB_USERNAME: xfers
-            DB_PASSWORD: password
+            DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
+            NODE_ENV: development
             RAILS_ENV: development
+            RUBYOPT: '-W:no-deprecated -W:no-experimental'
+            REDIS_URL: redis://redis:6379/
+            BUNDLE_JOBS: 4
+            BUNDLE_RETRY: 3
+            DEBIAN_FRONTEND: noninteractive
         working_dir: /xfers
+        tmpfs: /xfers/tmp
         command: >
-            /bin/bash -c "apt-get -qq update \
-                && apt-get -qq -f -y dist-upgrade \
-                && apt-get -qq install \
+            /bin/bash -c "
+                echo '##################################################' \
+                && echo 'Install nodejs' \
+                && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+                && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+                && echo 'deb http://dl.yarnpkg.com/debian/ stable main' \
+                    > /etc/apt/sources.list.d/yarn.list \
+                && apt-get -qq update \
+                && apt-get -yq dist-upgrade \
+                && apt-get -yq install --no-install-recommends \
                     ca-certificates \
                     curl \
                     git \
+                    nodejs \
                     rsync \
                     tzdata \
-                && echo '##################################################' \
-                && echo 'Install nodejs' \
-                && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-                && apt-get install -y nodejs \
-                && echo '##################################################' \
-                && echo 'Upgrade npm and install yarn' \
-                && npm install -g \
-                    npm@latest \
                     yarn \
+                && apt-get clean \
+                && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+                && truncate -s 0 /var/log/*log \
                 && echo '##################################################' \
-                && echo 'Gem Install Foreman' \
+                && echo 'Gem Update' \
+                && gem update --system \
+                && echo '##################################################' \
+                && echo 'Gem Install Bundler Foreman' \
                 && gem install bundler foreman \
                 && echo '##################################################' \
                 && echo 'Yarn Install' \
