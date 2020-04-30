@@ -1,0 +1,47 @@
+<%= form_with(model: txn, local: true) do |form| %>
+  <% if txn.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(txn.errors.count, "error") %> prohibited this txn from being saved:</h2>
+
+      <ul>
+        <% txn.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :txn_status_id %>
+    <%= form.text_field :txn_status_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :txn_type_id %>
+    <%= form.text_field :txn_type_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :user_id %>
+    <%= form.text_field :user_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :src_bank_id %>
+    <%= form.text_field :src_bank_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :dst_bank_id %>
+    <%= form.text_field :dst_bank_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :amt %>
+    <%= form.text_field :amt %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,2 @@
+class TxnStatus < ApplicationRecord
+end

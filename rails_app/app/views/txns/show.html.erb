@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Txn status:</strong>
+  <%= @txn.txn_status_id %>
+</p>
+
+<p>
+  <strong>Txn type:</strong>
+  <%= @txn.txn_type_id %>
+</p>
+
+<p>
+  <strong>User:</strong>
+  <%= @txn.user_id %>
+</p>
+
+<p>
+  <strong>Src bank:</strong>
+  <%= @txn.src_bank_id %>
+</p>
+
+<p>
+  <strong>Dst bank:</strong>
+  <%= @txn.dst_bank_id %>
+</p>
+
+<p>
+  <strong>Amt:</strong>
+  <%= @txn.amt %>
+</p>
+
+<%= link_to 'Edit', edit_txn_path(@txn) %> |
+<%= link_to 'Back', txns_path %>
