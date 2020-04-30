@@ -17,11 +17,13 @@ services:
         image: ruby:latest
         ports:
             - "3000:3000"
+            - "3035:3035"
         depends_on:
             - mysql
         volumes:
             - ./rails_app:/xfers:cached
-            - my-vendor1:/xfers/vendor
+            - my-vendor:/xfers/vendor
+            - my-node_modules:/xfers/node_modules
         environment:
             DB_HOST: mysql
             DB_PORT: 3306
@@ -39,12 +41,21 @@ services:
                     git \
                     rsync \
                     tzdata \
+                && echo '##################################################' \
+                && echo 'Install nodejs' \
                 && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
                 && apt-get install -y nodejs \
+                && echo '##################################################' \
+                && echo 'Upgrade npm and install yarn' \
                 && npm install -g \
                     npm@latest \
                     yarn \
-                && gem install bundler \
+                && echo '##################################################' \
+                && echo 'Gem Install Foreman' \
+                && gem install bundler foreman \
+                && echo '##################################################' \
+                && echo 'Yarn Install' \
+                && yarn install \
                 && echo '##################################################' \
                 && echo 'Bundle Install' \
                 && time bundle install --deployment --without test \
@@ -55,52 +66,9 @@ services:
                             db:create \
                             db:schema:load \
                             db:migrate \
-                && cd /xfers \
                 && echo '##################################################' \
-                && echo 'Bundle Rails Server' \
-                && bundle exec rails server -b 0.0.0.0"
-    webpacker:
-        image: ruby:latest
-        ports:
-            - "8080:8080"
-            - "3035:3035"
-        volumes:
-            - ./rails_app:/xfers:cached
-            - my-vendor2:/xfers/vendor
-            - my-node_modules:/xfers/node_modules
-        working_dir: /xfers
-        environment:
-            DB_HOST: mysql
-            DB_PORT: 3306
-            DB_NAME: edatest
-            DB_USERNAME: xfers
-            DB_PASSWORD: password
-            RAILS_ENV: development
-        command: >
-            /bin/bash -c "apt-get -qq update \
-                && apt-get -qq -f -y dist-upgrade \
-                && apt-get -qq install \
-                    ca-certificates \
-                    curl \
-                    git \
-                    tzdata \
-                && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-                && apt-get install -y nodejs \
-                && npm install -g \
-                    npm@latest \
-                    webpack \
-                    webpack-cli \
-                    webpack-dev-server \
-                    yarn \
-                && yarn \
-                && gem install bundler \
-                && echo '##################################################' \
-                && echo 'Bundle Install' \
-                && time bundle install --deployment --without test \
-                && echo '##################################################' \
-                && echo 'Webpacker Run' \
-                && /xfers/bin/webpack-dev-server --host 0.0.0.0"
+                && echo 'Run Foreman' \
+                && foreman start"
 volumes:
   my-node_modules:
-  my-vendor1:
-  my-vendor2:
+  my-vendor:
