@@ -1,0 +1,106 @@
+version: "3.7"
+services:
+    mysql:
+        image: mysql:5
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: edatest
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_USER: xfers
+            MYSQL_PASSWORD: password
+    redis:
+        image: redis:latest
+        ports:
+            - "6379:6379"
+    ruby:
+        image: ruby:latest
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mysql
+        volumes:
+            - ./rails_app:/xfers:cached
+            - my-vendor1:/xfers/vendor
+        environment:
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_NAME: edatest
+            DB_USERNAME: xfers
+            DB_PASSWORD: password
+            RAILS_ENV: development
+        working_dir: /xfers
+        command: >
+            /bin/bash -c "apt-get -qq update \
+                && apt-get -qq -f -y dist-upgrade \
+                && apt-get -qq install \
+                    ca-certificates \
+                    curl \
+                    git \
+                    rsync \
+                    tzdata \
+                && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+                && apt-get install -y nodejs \
+                && npm install -g \
+                    npm@latest \
+                    yarn \
+                && gem install bundler \
+                && echo '##################################################' \
+                && echo 'Bundle Install' \
+                && time bundle install --deployment --without test \
+                && echo '##################################################' \
+                && echo 'Bundle Rake' \
+                    && time bundle exec \
+                        rake db:drop \
+                            db:create \
+                            db:schema:load \
+                            db:migrate \
+                && cd /xfers \
+                && echo '##################################################' \
+                && echo 'Bundle Rails Server' \
+                && bundle exec rails server -b 0.0.0.0"
+    webpacker:
+        image: ruby:latest
+        ports:
+            - "8080:8080"
+            - "3035:3035"
+        volumes:
+            - ./rails_app:/xfers:cached
+            - my-vendor2:/xfers/vendor
+            - my-node_modules:/xfers/node_modules
+        working_dir: /xfers
+        environment:
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_NAME: edatest
+            DB_USERNAME: xfers
+            DB_PASSWORD: password
+            RAILS_ENV: development
+        command: >
+            /bin/bash -c "apt-get -qq update \
+                && apt-get -qq -f -y dist-upgrade \
+                && apt-get -qq install \
+                    ca-certificates \
+                    curl \
+                    git \
+                    tzdata \
+                && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+                && apt-get install -y nodejs \
+                && npm install -g \
+                    npm@latest \
+                    webpack \
+                    webpack-cli \
+                    webpack-dev-server \
+                    yarn \
+                && yarn \
+                && gem install bundler \
+                && echo '##################################################' \
+                && echo 'Bundle Install' \
+                && time bundle install --deployment --without test \
+                && echo '##################################################' \
+                && echo 'Webpacker Run' \
+                && /xfers/bin/webpack-dev-server --host 0.0.0.0"
+volumes:
+  my-node_modules:
+  my-vendor1:
+  my-vendor2:
