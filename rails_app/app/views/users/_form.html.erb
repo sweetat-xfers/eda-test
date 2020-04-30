@@ -1,6 +1,6 @@
 <%= form_with(model: user, local: true) do |form| %>
   <% if user.errors.any? %>
-    <div id="error_explanation">
+    <div class="bg-danger">
       <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
 
       <ul>
@@ -10,28 +10,51 @@
       </ul>
     </div>
   <% end %>
-
-  <div class="field">
+  <div class="form-group">
     <%= form.label :name %>
-    <%= form.text_field :name %>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="fas fa-user"></i>
+        </span>
+      </div>
+      <%= form.text_field :name, class: "form-control", placeholder: "Enter Name" %>
+    </div>
   </div>
-
-  <div class="field">
+  <div class="form-group">
     <%= form.label :dob %>
-    <%= form.date_select :dob %>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="fas fa-calendar-alt"></i>
+        </span>
+      </div>
+      <%= form.date_select :dob, class: "form-control", placeholder: "Enter Date of Birth" %>
+    </div>
   </div>
-
-  <div class="field">
+  <div class="form-group">
     <%= form.label :mobile %>
-    <%= form.text_field :mobile %>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="fas fa-mobile-alt"></i>
+        </span>
+      </div>
+      <%= form.text_field :mobile, class: "form-control", placeholder: "Enter Mobile" %>
+    </div>
   </div>
-
-  <div class="field">
+  <div class="form-group">
     <%= form.label :email %>
-    <%= form.text_field :email %>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="fas fa-envelope"></i>
+        </span>
+      </div>
+      <%= form.text_field :email, class: "form-control", type:"email", placeholder: "Enter email" %>
+    </div>
   </div>
-
-  <div class="actions">
-    <%= form.submit %>
+  <div class="card-footer">
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 <% end %>
