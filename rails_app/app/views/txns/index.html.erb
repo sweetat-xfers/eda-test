@@ -1,37 +1,46 @@
-<p id="notice"><%= notice %></p>
-
-<h1>Txns</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Txn status</th>
-      <th>Txn type</th>
-      <th>User</th>
-      <th>Src bank</th>
-      <th>Dst bank</th>
-      <th>Amt</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @txns.each do |txn| %>
+<div class="card">
+  <div class="card-header border-0">
+    <h3 class="card-title">Transactions (immutable)</h3>
+    <div class="card-tools">
+      <%= link_to '<i class="fas fa-plus-circle"></i>'.html_safe, new_txn_path, class: "btn btn-tool btn-sm" %>
+    </div>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-striped table-valign-middle">
+      <thead>
       <tr>
-        <td><%= txn.txn_status_id %></td>
-        <td><%= txn.txn_type_id %></td>
-        <td><%= txn.user_id %></td>
-        <td><%= txn.src_bank_id %></td>
-        <td><%= txn.dst_bank_id %></td>
-        <td><%= txn.amt %></td>
-        <td><%= link_to 'Show', txn %></td>
-        <td><%= link_to 'Edit', edit_txn_path(txn) %></td>
-        <td><%= link_to 'Destroy', txn, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <th>Txn status</th>
+        <th>Txn type</th>
+        <th>User</th>
+        <th>Src bank</th>
+        <th>Dst bank</th>
+        <th>Amt</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Txn', new_txn_path %>
+      </thead>
+      <tbody>
+      <% if defined?(notice) %>
+        <tr>
+          <td colspan="9"><%= notice %></td>
+        </tr>
+      <% end %>
+      <% @txns.each do |txn| %>
+        <tr>
+          <td>
+            <%= link_to txn do %>
+              <img src="<%= asset_path 'default-150x150.png' %>" alt="ID" class="img-circle img-size-32 mr-2">
+              <%= txn.id %>
+            <% end %>
+          </td>
+          <td><%= txn.txn_status_id %></td>
+          <td><%= txn.txn_type_id %></td>
+          <td><%= txn.user_id %></td>
+          <td><%= txn.src_bank_id %></td>
+          <td><%= txn.dst_bank_id %></td>
+          <td><%= txn.amt %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<!-- /.card -->

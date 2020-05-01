@@ -1,5 +1,5 @@
 class TxnsController < ApplicationController
-  before_action :set_txn, only: [:show, :edit, :update, :destroy]
+  before_action :set_txn, only: [:show, :update]
 
   # GET /txns
   # GET /txns.json
@@ -15,10 +15,6 @@ class TxnsController < ApplicationController
   # GET /txns/new
   def new
     @txn = Txn.new
-  end
-
-  # GET /txns/1/edit
-  def edit
   end
 
   # POST /txns
@@ -37,6 +33,7 @@ class TxnsController < ApplicationController
     end
   end
 
+  # Updates should only allow users to cancel txn
   # PATCH/PUT /txns/1
   # PATCH/PUT /txns/1.json
   def update
@@ -48,16 +45,6 @@ class TxnsController < ApplicationController
         format.html { render :edit }
         format.json { render json: @txn.errors, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /txns/1
-  # DELETE /txns/1.json
-  def destroy
-    @txn.destroy
-    respond_to do |format|
-      format.html { redirect_to txns_url, notice: 'Txn was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 
