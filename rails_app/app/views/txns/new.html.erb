@@ -1,5 +1,12 @@
-<h1>New Txn</h1>
-
-<%= render 'form', txn: @txn %>
-
-<%= link_to 'Back', txns_path %>
+<div class="card">
+  <div class="card-header border-0">
+    <h3 class="card-title">New Txn</h3>
+    <div class="card-tools">
+      <%= link_to '<i class="fas fa-plus-circle"></i>'.html_safe, new_txn_path, class: "btn btn-tool btn-sm" %>
+    </div>
+  </div>
+  <div class="card-body table-responsive ">
+    <%= render 'form', txn: @txn %>
+  </div>
+</div>
+<!-- /.card -->

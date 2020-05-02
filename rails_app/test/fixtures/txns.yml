@@ -1,17 +1,15 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  amt: 9.99
   txn_status: one
   txn_type: one
   user: one
-  src_bank: one
-  dst_bank: one
-  amt: 9.99
+  bank: one
 
 two:
+  amt: 9.99
   txn_status: two
   txn_type: two
   user: two
-  src_bank: two
-  dst_bank: two
-  amt: 9.99
+  bank: two

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_30_143558) do
+ActiveRecord::Schema.define(version: 2020_05_02_024639) do
 
   create_table "banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name"
@@ -31,19 +31,19 @@ ActiveRecord::Schema.define(version: 2020_04_30_143558) do
   end
 
   create_table "txns", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.decimal "amt", precision: 10
-    t.bigint "txn_status_id"
-    t.bigint "txn_type_id"
-    t.bigint "user_id"
-    t.bigint "src_bank"
-    t.bigint "dst_bank"
+    t.decimal "amt", precision: 20, scale: 5
+    t.bigint "txn_status_id", null: false
+    t.bigint "txn_type_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "src_bank_id", null: false
+    t.bigint "dst_bank_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["dst_bank"], name: "fk_rails_33fa24c943"
-    t.index ["src_bank"], name: "fk_rails_192879a8ec"
-    t.index ["txn_status_id"], name: "fk_rails_46c7b3e8bf"
-    t.index ["txn_type_id"], name: "fk_rails_e24322e737"
-    t.index ["user_id"], name: "fk_rails_da4e89bd76"
+    t.index ["dst_bank_id"], name: "index_txns_on_dst_bank_id"
+    t.index ["src_bank_id"], name: "index_txns_on_src_bank_id"
+    t.index ["txn_status_id"], name: "index_txns_on_txn_status_id"
+    t.index ["txn_type_id"], name: "index_txns_on_txn_type_id"
+    t.index ["user_id"], name: "index_txns_on_user_id"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -55,8 +55,8 @@ ActiveRecord::Schema.define(version: 2020_04_30_143558) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  add_foreign_key "txns", "banks", column: "dst_bank"
-  add_foreign_key "txns", "banks", column: "src_bank"
+  add_foreign_key "txns", "banks", column: "dst_bank_id"
+  add_foreign_key "txns", "banks", column: "src_bank_id"
   add_foreign_key "txns", "txn_statuses"
   add_foreign_key "txns", "txn_types"
   add_foreign_key "txns", "users"

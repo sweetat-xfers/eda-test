@@ -1,8 +1,8 @@
 development:
-  url: <%= ENV['DATABASE_URL'].gsub('?', '_development?') %>
+  url: <%= ENV.fetch('DATABASE_URL', 'mysql2://xfers:password@mysql:3306/edatest') %>
  
 test:
-  url: <%= ENV['DATABASE_URL'].gsub('?', '_test?') %>
+  url: <%= ENV.fetch('DATABASE_URL', 'mysql2://xfers:password@mysql:3306/edatest') %>
 
 production:
-  url: <%= ENV['DATABASE_URL'].gsub('?', '_production?') %>
+  url: <%= ENV.fetch('DATABASE_URL', 'mysql2://xfers:password@mysql:3306/eda') %>

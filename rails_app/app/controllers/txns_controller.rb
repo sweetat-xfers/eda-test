@@ -1,5 +1,5 @@
 class TxnsController < ApplicationController
-  before_action :set_txn, only: [:show, :update]
+  before_action :set_txn, only: [:show, :edit, :update, :destroy]
 
   # GET /txns
   # GET /txns.json
@@ -15,25 +15,36 @@ class TxnsController < ApplicationController
   # GET /txns/new
   def new
     @txn = Txn.new
+    @txn_type_list = TxnType.all
+    @bank_list = Bank.all
+  end
+
+  # GET /txns/1/edit
+  def edit
   end
 
   # POST /txns
   # POST /txns.json
   def create
     @txn = Txn.new(txn_params)
+    @txn.txn_status_id = 1
+    @txn.user_id = 1
+    # @txn.src_bank = Bank.find_by_id(txn_params[:src_bank_id])
+    # @txn.dst_bank = Bank.find_by_id(txn_params[:dst_bank_id])
 
     respond_to do |format|
       if @txn.save
         format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
         format.json { render :show, status: :created, location: @txn }
       else
+        @txn_type_list = TxnType.all
+        @bank_list = Bank.all
         format.html { render :new }
         format.json { render json: @txn.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # Updates should only allow users to cancel txn
   # PATCH/PUT /txns/1
   # PATCH/PUT /txns/1.json
   def update
@@ -48,6 +59,16 @@ class TxnsController < ApplicationController
     end
   end
 
+  # DELETE /txns/1
+  # DELETE /txns/1.json
+  def destroy
+    @txn.destroy
+    respond_to do |format|
+      format.html { redirect_to txns_url, notice: 'Txn was successfully destroyed.' }
+      format.json { head :no_content }
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_txn
@@ -56,6 +77,6 @@ class TxnsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def txn_params
-      params.require(:txn).permit(:txn_status_id, :txn_type_id, :user_id, :src_bank_id, :dst_bank_id, :amt)
+      params.require(:txn).permit(:amt, :txn_status_id, :txn_type_id, :user_id, :src_bank_id, :dst_bank_id)
     end
 end

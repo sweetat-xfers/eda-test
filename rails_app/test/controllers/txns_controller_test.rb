@@ -17,7 +17,7 @@ class TxnsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create txn" do
     assert_difference('Txn.count') do
-      post txns_url, params: { txn: { amt: @txn.amt, dst_bank_id: @txn.dst_bank_id, src_bank_id: @txn.src_bank_id, txn_status_id: @txn.txn_status_id, txn_type_id: @txn.txn_type_id, user_id: @txn.user_id } }
+      post txns_url, params: { txn: { amt: @txn.amt, bank_id: @txn.bank_id, txn_status_id: @txn.txn_status_id, txn_type_id: @txn.txn_type_id, user_id: @txn.user_id } }
     end
 
     assert_redirected_to txn_url(Txn.last)
@@ -34,7 +34,7 @@ class TxnsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update txn" do
-    patch txn_url(@txn), params: { txn: { amt: @txn.amt, dst_bank_id: @txn.dst_bank_id, src_bank_id: @txn.src_bank_id, txn_status_id: @txn.txn_status_id, txn_type_id: @txn.txn_type_id, user_id: @txn.user_id } }
+    patch txn_url(@txn), params: { txn: { amt: @txn.amt, bank_id: @txn.bank_id, txn_status_id: @txn.txn_status_id, txn_type_id: @txn.txn_type_id, user_id: @txn.user_id } }
     assert_redirected_to txn_url(@txn)
   end
 

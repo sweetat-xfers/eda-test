@@ -15,8 +15,7 @@ class TxnsTest < ApplicationSystemTestCase
     click_on "New Txn"
 
     fill_in "Amt", with: @txn.amt
-    fill_in "Dst bank", with: @txn.dst_bank_id
-    fill_in "Src bank", with: @txn.src_bank_id
+    fill_in "Bank", with: @txn.bank_id
     fill_in "Txn status", with: @txn.txn_status_id
     fill_in "Txn type", with: @txn.txn_type_id
     fill_in "User", with: @txn.user_id
@@ -31,8 +30,7 @@ class TxnsTest < ApplicationSystemTestCase
     click_on "Edit", match: :first
 
     fill_in "Amt", with: @txn.amt
-    fill_in "Dst bank", with: @txn.dst_bank_id
-    fill_in "Src bank", with: @txn.src_bank_id
+    fill_in "Bank", with: @txn.bank_id
     fill_in "Txn status", with: @txn.txn_status_id
     fill_in "Txn type", with: @txn.txn_type_id
     fill_in "User", with: @txn.user_id

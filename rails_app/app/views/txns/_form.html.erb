@@ -1,6 +1,6 @@
 <%= form_with(model: txn, local: true) do |form| %>
   <% if txn.errors.any? %>
-    <div id="error_explanation">
+    <div class="bg-danger">
       <h2><%= pluralize(txn.errors.count, "error") %> prohibited this txn from being saved:</h2>
 
       <ul>
@@ -10,38 +10,40 @@
       </ul>
     </div>
   <% end %>
-
-  <div class="field">
-    <%= form.label :txn_status_id %>
-    <%= form.text_field :txn_status_id %>
-  </div>
-
-  <div class="field">
+  <div class="form-group">
     <%= form.label :txn_type_id %>
-    <%= form.text_field :txn_type_id %>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="fas fa-txn"></i>
+        </span>
+      </div>
+      <% txn_type_options = options_from_collection_for_select(@txn_type_list, 'id', 'name') %>
+      <%= form.select :txn_type_id, txn_type_options, {}, {class: "form-control"} %>
+    </div>
   </div>
-
-  <div class="field">
-    <%= form.label :user_id %>
-    <%= form.text_field :user_id %>
-  </div>
-
-  <div class="field">
+  <% bank_options = options_from_collection_for_select(@bank_list, 'id', 'name') %>
+  <div class="form-group">
     <%= form.label :src_bank_id %>
-    <%= form.text_field :src_bank_id %>
+    <%= form.select :src_bank_id, bank_options, {}, {class: "form-control"} %>
   </div>
-
-  <div class="field">
+  <div class="form-group">
     <%= form.label :dst_bank_id %>
-    <%= form.text_field :dst_bank_id %>
+    <%= form.select :dst_bank_id, bank_options, {}, {class: "form-control"} %> 
   </div>
-
-  <div class="field">
+  <div class="form-group">
     <%= form.label :amt %>
-    <%= form.text_field :amt %>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="fas fa-wallet"></i>
+        </span>
+      </div>
+      <%= form.text_field :amt, class: "form-control", placeholder: "Enter Amount of Txn" %>
+    </div>
   </div>
-
-  <div class="actions">
-    <%= form.submit %>
+  <div class="card-footer">
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 <% end %>
+<!-- /card -->
