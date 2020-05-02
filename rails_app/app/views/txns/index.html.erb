@@ -9,6 +9,7 @@
     <table class="table table-striped table-valign-middle">
       <thead>
       <tr>
+        <th>Txn ID</th>
         <th>Txn status</th>
         <th>Txn type</th>
         <th>User</th>
@@ -31,11 +32,11 @@
               <%= txn.id %>
             <% end %>
           </td>
-          <td><%= txn.txn_status_id %></td>
-          <td><%= txn.txn_type_id %></td>
-          <td><%= txn.user_id %></td>
-          <td><%= txn.src_bank_id %></td>
-          <td><%= txn.dst_bank_id %></td>
+          <td><%= txn.txn_status.name %></td>
+          <td><%= txn.txn_type.name %></td>
+          <td><%= txn.user.name %></td>
+          <td><%= txn.src_bank.name %></td>
+          <td><%= txn.dst_bank.name %></td>
           <td><%= txn.amt %></td>
         </tr>
       <% end %>
