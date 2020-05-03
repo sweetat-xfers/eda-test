@@ -1,5 +1,6 @@
 class TxnsController < ApplicationController
-  before_action :set_txn, only: [:show, :edit, :update, :destroy]
+  before_action :set_txn, only: [:show, :edit, :update ]
+  include Phobos::Producer
 
   # GET /txns
   # GET /txns.json
@@ -29,11 +30,13 @@ class TxnsController < ApplicationController
     @txn = Txn.new(txn_params)
     @txn.txn_status_id = 1
     @txn.user_id = 1
-    # @txn.src_bank = Bank.find_by_id(txn_params[:src_bank_id])
-    # @txn.dst_bank = Bank.find_by_id(txn_params[:dst_bank_id])
 
     respond_to do |format|
       if @txn.save
+        self.producer.publish(
+          topic: 'txn.created',
+          payload: @txn.to_json,
+        )
         format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
         format.json { render :show, status: :created, location: @txn }
       else
