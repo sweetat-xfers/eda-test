@@ -71,10 +71,8 @@ services:
                 && echo '##################################################' \
                 && echo 'Bundle Rake' \
                     && time bundle exec \
-                        rake db:drop \
-                            db:create \
-                            db:schema:load \
-                            db:migrate \
+                      rake db:migrate:reset \
+                            db:seed \
                 && echo '##################################################' \
                 && echo 'Run Foreman' \
                 && foreman start"
