@@ -3,7 +3,7 @@ services:
     mysql:
         image: mysql:5
         ports:
-            - "3306:3306"
+            - 3306:3306
         environment:
             MYSQL_DATABASE: edatest
             MYSQL_ROOT_PASSWORD: password
@@ -12,12 +12,12 @@ services:
     redis:
         image: redis:latest
         ports:
-            - "6379:6379"
+            - 6379:6379
     ruby:
         image: ruby:latest
         ports:
-            - "3000:3000"
-            - "3035:3035"
+            - 3000:3000
+            - 3035:3035
         depends_on:
             - mysql
         volumes:
@@ -78,51 +78,74 @@ services:
                 && foreman start"
     zookeeper:
         image: confluentinc/cp-zookeeper:5.5.0
-        hostname: zookeeper
-        container_name: zookeeper
+        volumes:
+            - ./docker/broker/jmx-exporter:/etc/jmx-exporter
         ports:
-            - "2181:2181"
+            - 7071:7071
+            - 2181:2181
         environment:
             ZOOKEEPER_CLIENT_PORT: 2181
             ZOOKEEPER_TICK_TIME: 2000
-    broker:
+            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7071:/etc/jmx-exporter/zookeeper.yml
+    broker1:
         image: confluentinc/cp-kafka:5.5.0
-        hostname: broker
-        container_name: broker
         depends_on:
             - zookeeper
         ports:
-            - "29092:29092"
-            - "9092:9092"
+            - 7072:7072
+            - 9092:9092
+            - 29092:29092
         environment:
             KAFKA_BROKER_ID: 1
             KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker1:9092,PLAINTEXT_HOST://localhost:29092
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
             KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
             KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
             KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7072:/etc/jmx-exporter/kafka-2_0_0.yml
+    broker2:
+        image: confluentinc/cp-kafka:5.5.0
+        volumes:
+            - ./docker/broker/jmx-exporter:/etc/jmx-exporter
+        depends_on:
+            - zookeeper
+        ports:
+            - 7073:7073
+            - 9093:9093
+            - 29093:29093
+        environment:
+            KAFKA_BROKER_ID: 2
+            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker2:9093,PLAINTEXT_HOST://localhost:29093
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7073:/etc/jmx-exporter/kafka-2_0_0.yml
     kafka-exporter:
         image: danielqsj/kafka-exporter:latest
         depends_on: 
-            - broker
+            - broker1
+            - broker2
         ports:
-            - "9308:9308"
-        command: "--kafka.server=broker:29092"
+            - 9308:9308
+        command: "--kafka.server=broker1:9092 --kafka.server=broker2:9093"
     prometheus:
         image: prom/prometheus
         ports:
-            - "9090:9090"
+            - 9090:9090
         volumes:
             - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     grafana:
         image: grafana/grafana
         volumes:
             - ./docker/grafana/provisioning:/etc/grafana/provisioning
-            - ./docker/grafana/var/dashboards:/var/lib/grafana/dashboards
+        #    - ./docker/grafana/var/dashboards:/var/lib/grafana/dashboards
         ports:
-            - "3080:3080"
+            - 3080:3080
         environment:
             GF_SERVER_HTTP_PORT: 3080
             GF_PATHS_PROVISIONING: /etc/grafana/provisioning

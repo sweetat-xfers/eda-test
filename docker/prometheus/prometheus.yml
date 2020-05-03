@@ -6,3 +6,6 @@ scrape_configs:
     - targets: 
       - localhost:9090
       - kafka-exporter:9308
+      - zookeeper:7071
+      - broker1:7072
+      - broker2:7073
