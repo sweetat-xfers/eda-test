@@ -120,6 +120,7 @@ services:
         image: grafana/grafana
         volumes:
             - ./docker/grafana/provisioning:/etc/grafana/provisioning
+            - ./docker/grafana/var/dashboards:/var/lib/grafana/dashboards
         ports:
             - "3080:3080"
         environment:
