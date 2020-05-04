@@ -5,7 +5,9 @@ scrape_configs:
     static_configs:
     - targets: 
       - localhost:9090
-      - kafka-exporter:9308
-      - zookeeper:7071
-      - broker1:7072
-      - broker2:7073
+      - kafka-minion:8100
+      - zookeeper1:7061
+      - zookeeper2:7062
+      - broker1:7071
+      - broker2:7072
+      - broker3:7073

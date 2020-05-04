@@ -76,63 +76,95 @@ services:
                 && echo '##################################################' \
                 && echo 'Run Foreman' \
                 && foreman start"
-    zookeeper:
+    zookeeper1:
         image: confluentinc/cp-zookeeper:5.5.0
         volumes:
             - ./docker/broker/jmx-exporter:/etc/jmx-exporter
         ports:
-            - 7071:7071
+            - 7061:7061
             - 2181:2181
         environment:
+            ZOOKEEPER_SERVER_ID: 1
             ZOOKEEPER_CLIENT_PORT: 2181
             ZOOKEEPER_TICK_TIME: 2000
-            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7071:/etc/jmx-exporter/zookeeper.yml
+            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7061:/etc/jmx-exporter/zookeeper.yaml
+    zookeeper2:
+        image: confluentinc/cp-zookeeper:5.5.0
+        volumes:
+            - ./docker/broker/jmx-exporter:/etc/jmx-exporter
+        ports:
+            - 7062:7062
+            - 2182:2182
+        environment:
+            ZOOKEEPER_SERVER_ID: 2
+            ZOOKEEPER_CLIENT_PORT: 2182
+            ZOOKEEPER_TICK_TIME: 2000
+            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7062:/etc/jmx-exporter/zookeeper.yaml
     broker1:
         image: confluentinc/cp-kafka:5.5.0
+        volumes:
+            - ./docker/broker/jmx-exporter:/etc/jmx-exporter
         depends_on:
-            - zookeeper
+            - zookeeper1
+            - zookeeper2
         ports:
-            - 7072:7072
-            - 9092:9092
-            - 29092:29092
+            - 7071:7071
+            - 9091:9091
+            - 19092:19092
         environment:
             KAFKA_BROKER_ID: 1
-            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182'
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker1:9092,PLAINTEXT_HOST://localhost:29092
-            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7072:/etc/jmx-exporter/kafka-2_0_0.yml
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker1:9091,PLAINTEXT_HOST://localhost:19092
+            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7071:/etc/jmx-exporter/kafka-2_0_0.yml
     broker2:
         image: confluentinc/cp-kafka:5.5.0
         volumes:
             - ./docker/broker/jmx-exporter:/etc/jmx-exporter
         depends_on:
-            - zookeeper
+            - zookeeper1
+            - zookeeper2
+        ports:
+            - 7072:7072
+            - 9092:9092
+            - 29092:29092
+        environment:
+            KAFKA_BROKER_ID: 2
+            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182'
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker2:9092,PLAINTEXT_HOST://localhost:29092
+            KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7072:/etc/jmx-exporter/kafka-2_0_0.yml
+    broker3:
+        image: confluentinc/cp-kafka:5.5.0
+        volumes:
+            - ./docker/broker/jmx-exporter:/etc/jmx-exporter
+        depends_on:
+            - zookeeper1
+            - zookeeper2
         ports:
             - 7073:7073
             - 9093:9093
-            - 29093:29093
+            - 39092:39092
         environment:
-            KAFKA_BROKER_ID: 2
-            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+            KAFKA_BROKER_ID: 3
+            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182'
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker2:9093,PLAINTEXT_HOST://localhost:29093
-            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker3:9093,PLAINTEXT_HOST://localhost:39092
             KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7073:/etc/jmx-exporter/kafka-2_0_0.yml
-    kafka-exporter:
-        image: danielqsj/kafka-exporter:latest
+    kafka-minion:
+        image: quay.io/google-cloud-tools/kafka-minion
         depends_on: 
             - broker1
             - broker2
+            - broker3
         ports:
-            - 9308:9308
-        command: "--kafka.server=broker1:9092 --kafka.server=broker2:9093"
+            - 8100:8100
+        restart: always
+        environment:
+            KAFKA_VERSION: 2.2.0
+            KAFKA_BROKERS: broker1:9091,broker2:9092,broker3:9093
+            TELEMETRY_HOST: 0.0.0.0
+            TELEMETRY_PORT: 8100
     prometheus:
         image: prom/prometheus
         ports:
@@ -143,7 +175,7 @@ services:
         image: grafana/grafana
         volumes:
             - ./docker/grafana/provisioning:/etc/grafana/provisioning
-        #    - ./docker/grafana/var/dashboards:/var/lib/grafana/dashboards
+            - ./docker/grafana/var/dashboards:/var/lib/grafana/dashboards
         ports:
             - 3080:3080
         environment:
@@ -151,6 +183,35 @@ services:
             GF_PATHS_PROVISIONING: /etc/grafana/provisioning
             GF_REMOTE_CACHE_TYPE: redis
             GF_REMOTE_CACHE_CONNSTR: addr=redis:6379
+    datagen:
+        image: cnfldemos/kafka-connect-datagen:0.3.1-5.4.1
+        depends_on:
+            - zookeeper1
+            - zookeeper2
+            - broker1
+            - broker2
+            - broker3
+        ports:
+            - 8083:8083
+        environment:
+            CONNECT_BOOTSTRAP_SERVERS: broker1:9091,broker2:9092,broker3:9093
+            CONNECT_REST_ADVERTISED_HOST_NAME: datagen
+            CONNECT_REST_PORT: 8083
+            CONNECT_GROUP_ID: compose-connect-group
+            CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+            CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+            CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+            CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+            CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+            CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter 
+            CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2182
+            CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+            CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
 volumes:
     my-node_modules:
     my-vendor:
