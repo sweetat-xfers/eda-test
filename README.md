@@ -7,6 +7,17 @@ two distinct Event Driven Architectures.  The common technical stack across incl
 1. Ruby on Rails
 2. MySQL
 
+# Getting Started
+
+```
+git clone https://github.com/sweetat-xfers/eda-test.git
+cd eda-test
+docker-compose up -d
+docker-compose logs --follow
+```
+
+# Educational Text
+
 ## Mediator Based EDA
 ![Mediator EDA](https://www.oreilly.com/library/view/software-architecture-patterns/9781491971437/assets/sapr_0201.png)
 
