@@ -274,6 +274,33 @@ services:
                 && echo 'Install Bundle' \
                 && bundle install \
                 && phobos start"
+    cg2:
+        image: ruby:latest
+        depends_on:
+            - mysql
+            - zookeeper1
+            # - zookeeper2
+            - broker1
+            # - broker2
+            # - broker3
+        volumes:
+            - ./kafka/cg2-pretradecheck:/xfers:cached
+            - /xfers/vendor
+        environment:
+            RUBYOPT: '-W:no-deprecated -W:no-experimental'
+            BUNDLE_JOBS: 4
+            BUNDLE_RETRY: 3
+        working_dir: /xfers
+        tmpfs: /xfers/tmp
+        command: >
+            /bin/bash -c " \
+                echo '##################################################' \
+                && echo 'Gem install Bundler' \
+                && gem install bundler \
+                && echo '##################################################' \
+                && echo 'Install Bundle' \
+                && bundle install \
+                && phobos start"
 volumes:
     my-node_modules:
     my-vendor:  
