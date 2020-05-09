@@ -18,6 +18,7 @@ class PreTradeChecksHandler
             Phobos.logger.info("txn.pretrade.ok.(#{payload}).(#{_metadata})")
         else
             txn[:errors] = {'msg': 'too.low'}
+            txn["txn_status_id"] = 7 # This should be a static constant that may just be configured at initial creation
             rej_payload = txn.to_json
             producer.async_publish(
                 topic: "txn.pretrade.rejected", 
