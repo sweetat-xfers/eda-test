@@ -260,7 +260,6 @@ services:
             - /xfers/vendor
         environment:
             DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
-            RAILS_ENV: development
             RUBYOPT: '-W:no-deprecated -W:no-experimental'
             BUNDLE_JOBS: 4
             BUNDLE_RETRY: 3
