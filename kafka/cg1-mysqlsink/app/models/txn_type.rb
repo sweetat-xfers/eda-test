@@ -1,0 +1,2 @@
+class TxnType < ApplicationRecord
+end
