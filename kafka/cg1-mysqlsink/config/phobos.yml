@@ -3,7 +3,7 @@ logger:
   file: false
   # Optional output format for stdout, default is false (human readable).
   # Set to true to enable json output.
-  stdout_json: true
+  stdout_json: false
   level: info
   # Comment the block to disable ruby-kafka logs
   ruby_kafka:

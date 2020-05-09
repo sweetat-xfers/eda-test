@@ -1,3 +1,0 @@
-development:
-  url: <%= ENV.fetch('DATABASE_URL', 'mysql2://xfers:password@mysql:3306/edatest') %>
- 

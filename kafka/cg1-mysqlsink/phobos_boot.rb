@@ -11,5 +11,4 @@ puts "
 phobos_boot.rb - find this file at #{File.expand_path(__FILE__)}
 
 "
-
 require_relative 'app/consumers/sink-mysql-handler'

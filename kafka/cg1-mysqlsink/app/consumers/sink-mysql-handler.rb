@@ -1,5 +1,3 @@
-require 'yaml'
-require 'erb'
 require 'active_record'
 
 require_relative '../models/application_record'
@@ -13,26 +11,23 @@ class SinkMysqlHandler
   include Phobos::Handler
 
   def self.start(kafka_client)
-    db_config_file = File.read('config/database.yml')
-    db_config_erb = ERB.new(db_config_file).result
-    db_config = YAML::load(db_config_erb)
-    puts db_config
+    db_adapter = ENV["DATABASE_ADAPTER"] ||= "mysql2"
+    db_url = ENV["DATABASE_URL"] ||= "mysql2://xfers:password@mysql:3306/edatest"
+    Phobos.logger.info("db_adapter.(#{db_adapter}).db_url.(#{db_url})")
 
-    env = ENV.fetch('environment', 'development')
-    curr_db_config = db_config[env]
-
-    ActiveRecord::Base.establish_connection(curr_db_config)
-  end 
+    ActiveRecord::Base.establish_connection(adapter: db_adapter, url: db_url)
+    Phobos.logger.info("self.start.establish_connection(#{db_url})")
+  end
 
   def consume(payload, _metadata)
-    Phobos.logger.info "consume (#{payload}),(#{_metadata})"
+    Phobos.logger.info "consume(#{payload}),(#{_metadata})"
     txn = Txn.new.from_json(payload)
     Phobos.logger.info "Txn.new.from_json(#{txn})"
 
     ActiveRecord::Base.transaction do
       unless txn.save
         txn.errors.messages.each do |field, messages|
-          Phobos.logger.error "error(#{txn}).(#{field}: #{messages})"
+          Phobos.logger.error "save.errors(#{txn}).(#{field}: #{messages})"
         end
       end
     end

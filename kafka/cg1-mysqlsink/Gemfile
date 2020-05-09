@@ -11,4 +11,6 @@ gem 'phobos'
 gem 'mysql2', '~> 0.5'
 # ActiveRecord
 gem 'activerecord'
+# https://github.com/phobos/phobos_prometheus
+# gem 'phobos_prometheus'
 
