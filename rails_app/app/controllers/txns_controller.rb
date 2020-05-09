@@ -32,19 +32,13 @@ class TxnsController < ApplicationController
     @txn.user_id = 1
 
     respond_to do |format|
-      if @txn.save
-        self.producer.publish(
-          topic: 'txn.created',
-          payload: @txn.to_json,
-        )
-        format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
-        format.json { render :show, status: :created, location: @txn }
-      else
-        @txn_type_list = TxnType.all
-        @bank_list = Bank.all
-        format.html { render :new }
-        format.json { render json: @txn.errors, status: :unprocessable_entity }
-      end
+      ## Need to check for validity
+      self.producer.publish(
+        topic: 'txn.created',
+        payload: @txn.to_json,
+      )
+      format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
+      format.json { render :show, status: :created, location: @txn }
     end
   end
 
