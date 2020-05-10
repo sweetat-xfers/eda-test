@@ -30,11 +30,13 @@ class TxnsController < ApplicationController
     @txn = Txn.new(txn_params)
     @txn.txn_status_id = 1
     @txn.user_id = 1
+    @txn.created_at = Time.now
+    @txn.updated_at = @txn.created_at
 
     respond_to do |format|
       ## Need to check for validity
       self.producer.publish(
-        topic: 'txn.created',
+        topic: 'txn.new',
         payload: @txn.to_json,
       )
       format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
@@ -44,17 +46,17 @@ class TxnsController < ApplicationController
 
   # PATCH/PUT /txns/1
   # PATCH/PUT /txns/1.json
-  def update
-    respond_to do |format|
-      if @txn.update(txn_params)
-        format.html { redirect_to @txn, notice: 'Txn was successfully updated.' }
-        format.json { render :show, status: :ok, location: @txn }
-      else
-        format.html { render :edit }
-        format.json { render json: @txn.errors, status: :unprocessable_entity }
-      end
-    end
-  end
+  # def update
+  #   respond_to do |format|
+  #     if @txn.update(txn_params)
+  #       format.html { redirect_to @txn, notice: 'Txn was successfully updated.' }
+  #       format.json { render :show, status: :ok, location: @txn }
+  #     else
+  #       format.html { render :edit }
+  #       format.json { render json: @txn.errors, status: :unprocessable_entity }
+  #     end
+  #   end
+  # end
 
   # DELETE /txns/1
   # DELETE /txns/1.json
