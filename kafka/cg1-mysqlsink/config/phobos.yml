@@ -93,7 +93,7 @@ listeners:
     group_id: cg1
     # Number of threads created for this listener, each thread will behave as an independent consumer.
     # They don't share any state
-    max_concurrency: 1
+    max_concurrency: 1 
     # Once the consumer group has checkpointed its progress in the topic's partitions,
     # the consumers will always start from the checkpointed offsets, regardless of config
     # As such, this setting only applies when the consumer initially starts consuming from a topic
@@ -103,7 +103,7 @@ listeners:
     # Minimum number of bytes to read before returning messages from the server; if `max_wait_time` is reached, this is ignored.
     min_bytes: 1
     # Maximum duration of time to wait before returning messages from the server, in seconds
-    max_wait_time: 5
+    max_wait_time: 60000 
     # Apply this encoding to the message payload, if blank it uses the original encoding. This property accepts values
     # defined by the ruby Encoding class (https://ruby-doc.org/core-2.3.0/Encoding.html). Ex: UTF_8, ASCII_8BIT, etc
     force_encoding:
