@@ -6,3 +6,8 @@ ruby '2.7.1'
 # 20200502
 # https://github.com/phobos/phobos
 gem 'phobos'
+
+group :development, :test do
+    gem 'ruby-debug-ide'
+    gem 'debase'
+end

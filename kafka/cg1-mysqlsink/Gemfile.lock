@@ -15,6 +15,9 @@ GEM
     concurrent-ruby (1.1.6)
     concurrent-ruby-ext (1.1.6)
       concurrent-ruby (= 1.1.6)
+    debase (0.2.4.1)
+      debase-ruby_core_source (>= 0.10.2)
+    debase-ruby_core_source (0.10.9)
     digest-crc (0.5.1)
     exponential-backoff (0.0.4)
     i18n (1.8.2)
@@ -34,6 +37,9 @@ GEM
       logging
       ruby-kafka
       thor
+    rake (13.0.1)
+    ruby-debug-ide (0.7.2)
+      rake (>= 0.8.1)
     ruby-kafka (1.0.0)
       digest-crc
     thor (1.0.1)
@@ -47,8 +53,10 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  debase
   mysql2 (~> 0.5)
   phobos
+  ruby-debug-ide
 
 RUBY VERSION
    ruby 2.7.1p83
