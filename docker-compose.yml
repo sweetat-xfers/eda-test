@@ -22,7 +22,7 @@ services:
             - mysql
         volumes:
             - ./rails_app:/xfers:cached
-            - my-vendor:/xfers/vendor
+            - /usr/local/bundle
             - my-node_modules:/xfers/node_modules
         environment:
             DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
@@ -67,7 +67,9 @@ services:
                 && yarn install \
                 && echo '##################################################' \
                 && echo 'Bundle Install' \
-                && time bundle install --deployment --without test \
+                && time bundle install \
+                    --with=development \
+                    --without=test \
                 && echo '##################################################' \
                 && echo 'Bundle Rake' \
                     && time bundle exec \
@@ -246,34 +248,42 @@ services:
     #         CONNECT_REST_ADVERTISED_PORT: 7000
     #         CONNECT_REST_PORT: 7000
     #         CONNECT_GROUP_ID: 1
-    cg1:
-        image: ruby:latest
-        depends_on:
-            - mysql
-            - zookeeper1
-            # - zookeeper2
-            - broker1
-            # - broker2
-            # - broker3
-        volumes:
-            - ./kafka/cg1-mysqlsink:/xfers:cached
-            - /xfers/vendor
-        environment:
-            DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
-            RUBYOPT: '-W:no-deprecated -W:no-experimental'
-            BUNDLE_JOBS: 4
-            BUNDLE_RETRY: 3
-        working_dir: /xfers
-        tmpfs: /xfers/tmp
-        command: >
-            /bin/bash -c " \
-                echo '##################################################' \
-                && echo 'Gem install Bundler' \
-                && gem install bundler \
-                && echo '##################################################' \
-                && echo 'Install Bundle' \
-                && bundle install \
-                && phobos start"
+    # cg1:
+    #     image: ruby:latest
+    #     depends_on:
+    #         - mysql
+    #         - zookeeper1
+    #         # - zookeeper2
+    #         - broker1
+    #         # - broker2
+    #         # - broker3
+    #     ports:
+    #         - 3101:3101
+    #     volumes:
+    #         - ./kafka/cg1-mysqlsink:/xfers:cached
+    #         - /usr/local/bundle
+    #     environment:
+    #         DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
+    #         RUBYOPT: '-W:no-deprecated -W:no-experimental'
+    #         BUNDLE_JOBS: 4
+    #         BUNDLE_RETRY: 3
+    #     working_dir: /xfers
+    #     command: >
+    #         /bin/bash -c " \
+    #             echo '##################################################' \
+    #             && echo 'Gem install Bundler' \
+    #             && gem install bundler \
+    #             && echo '##################################################' \
+    #             && echo 'Install Bundle' \
+    #             && bundle install \
+    #                 --with=development \
+    #             && echo '##################################################' \
+    #             && echo 'Running rdebug ide' \
+    #             && bundle exec rdebug-ide \
+    #                 --host 0.0.0.0 \
+    #                 --port 3101 \
+    #                 --dispatcher-port 3101 \
+    #                 -- /usr/local/bin/bundle exec phobos start"
     cg2:
         image: ruby:latest
         depends_on:
@@ -283,15 +293,16 @@ services:
             - broker1
             # - broker2
             # - broker3
+        ports:
+            - 3102:3102
         volumes:
             - ./kafka/cg2-pretradecheck:/xfers:cached
-            - /xfers/vendor
+            - /usr/local/bundle
         environment:
             RUBYOPT: '-W:no-deprecated -W:no-experimental'
             BUNDLE_JOBS: 4
             BUNDLE_RETRY: 3
         working_dir: /xfers
-        tmpfs: /xfers/tmp
         command: >
             /bin/bash -c " \
                 echo '##################################################' \
@@ -300,7 +311,48 @@ services:
                 && echo '##################################################' \
                 && echo 'Install Bundle' \
                 && bundle install \
-                && phobos start"
+                    --with=development \
+                && echo '##################################################' \
+                && echo 'Running rdebug ide' \
+                && bundle exec rdebug-ide \
+                    --host 0.0.0.0 \
+                    --port 3102 \
+                    --dispatcher-port 3102 \
+                    -- /usr/local/bin/bundle exec phobos start"
+    cg3:
+        image: ruby:latest
+        depends_on:
+            - mysql
+            - zookeeper1
+            # - zookeeper2
+            - broker1
+            # - broker2
+            # - broker3
+        ports:
+            - 3103:3103
+        volumes:
+            - ./kafka/cg3-xfersfees:/xfers:cached
+            - /usr/local/bundle
+        environment:
+            RUBYOPT: '-W:no-deprecated -W:no-experimental'
+            BUNDLE_JOBS: 4
+            BUNDLE_RETRY: 3
+        working_dir: /xfers
+        command: >
+            /bin/bash -c " \
+                echo '##################################################' \
+                && echo 'Gem install Bundler' \
+                && gem install bundler \
+                && echo '##################################################' \
+                && echo 'Install Bundle' \
+                && bundle install \
+                    --with=development \
+                && echo '##################################################' \
+                && echo 'Running rdebug ide' \
+                && bundle exec rdebug-ide \
+                    --host 0.0.0.0 \
+                    --port 3103 \
+                    --dispatcher-port 3103 \
+                    -- /usr/local/bin/bundle exec phobos start"
 volumes:
     my-node_modules:
-    my-vendor:  
