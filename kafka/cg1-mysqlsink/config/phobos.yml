@@ -44,13 +44,51 @@ consumer:
   # interval between heartbeats; must be less than the session window
   heartbeat_interval: 10
 
+producer:
+  # number of seconds a broker can wait for replicas to acknowledge
+  # a write before responding with a timeout
+  ack_timeout: 5
+  # number of replicas that must acknowledge a write, or `:all`
+  # if all in-sync replicas must acknowledge
+  required_acks: :all
+  # number of retries that should be attempted before giving up sending
+  # messages to the cluster. Does not include the original attempt
+  max_retries: 2
+  # number of seconds to wait between retries
+  retry_backoff: 1
+  # number of messages allowed in the buffer before new writes will
+  # raise {BufferOverflow} exceptions
+  max_buffer_size: 1000
+  # maximum size of the buffer in bytes. Attempting to produce messages
+  # when the buffer reaches this size will result in {BufferOverflow} being raised
+  max_buffer_bytesize: 10000000
+  # name of the compression codec to use, or nil if no compression should be performed.
+  # Valid codecs: `:snappy` and `:gzip`
+  compression_codec: :gzip
+  # number of messages that needs to be in a message set before it should be compressed.
+  # Note that message sets are per-partition rather than per-topic or per-producer
+  compression_threshold: 1
+  # maximum number of messages allowed in the queue. Only used for async_producer
+  max_queue_size: 1000
+  # if greater than zero, the number of buffered messages that will automatically
+  # trigger a delivery. Only used for async_producer
+  delivery_threshold: 0
+  # if greater than zero, the number of seconds between automatic message
+  # deliveries. Only used for async_producer
+  delivery_interval: 0
+  # Set this to true to keep the producer connection between publish calls.
+  # This can speed up subsequent messages by around 30%, but it does mean
+  # that you need to manually call sync_producer_shutdown before exiting,
+  # similar to async_producer_shutdown.
+  persistent_connections: false
+
 backoff:
-  min_ms: 1000
-  max_ms: 60000
+  min_ms: 60000
+  max_ms: 600000
 
 listeners:
   - handler: SinkMysqlHandler
-    topic: txn.created
+    topic: txn.new
     # id of the group that the consumer should join
     group_id: cg1
     # Number of threads created for this listener, each thread will behave as an independent consumer.
@@ -59,7 +97,7 @@ listeners:
     # Once the consumer group has checkpointed its progress in the topic's partitions,
     # the consumers will always start from the checkpointed offsets, regardless of config
     # As such, this setting only applies when the consumer initially starts consuming from a topic
-    start_from_beginning: true
+    start_from_beginning: false
     # maximum amount of data fetched from a single partition at a time
     max_bytes_per_partition: 524288 # 512 KB
     # Minimum number of bytes to read before returning messages from the server; if `max_wait_time` is reached, this is ignored.
@@ -80,10 +118,6 @@ listeners:
     #     instead of Phobos::Handler so that you can make use of the `consume_batch` etc. methods.
     # Note: Ultimately commit/heartbeart will depend on the offset commit options and the heartbeat interval.
     delivery: message
-    # Use this if custom backoff is required for a listener
-    backoff:
-      min_ms: 500
-      max_ms: 10000
     # session_timeout, offset_commit_interval, offset_commit_threshold, offset_retention_time, and heartbeat_interval
     # can be customized per listener if desired
     session_timeout: 30
