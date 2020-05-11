@@ -19,6 +19,17 @@ docker-compose up -d
 docker-compose logs --follow
 ```
 
+For redis test
+```bash
+git clone https://github.com/sweetat-xfers/eda-test.git
+cd eda-test
+docker-compose -f redis-docker-compose.yml build
+docker-compose -f redis-docker-compose.yml up -d
+docker-compose -f redis-docker-compose.yml web run bundle exec rake db:migrate:reset 
+docker-compose -f redis-docker-compose.yml web run bundle exec rake db:seed
+```
+Go to localhost:3000/sidekiq
+
 ## Educational Text
 
 ### Mediator Based EDA
