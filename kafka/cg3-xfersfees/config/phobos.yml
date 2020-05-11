@@ -11,7 +11,7 @@ logger:
 
 kafka:
   # identifier for this application
-  client_id: cg1
+  client_id: cg2
   # timeout setting for connecting to brokers
   connect_timeout:
   # timeout setting for socket connections
@@ -83,27 +83,27 @@ producer:
   persistent_connections: false
 
 backoff:
-  min_ms: 60000
-  max_ms: 600000
+  min_ms: 1000
+  max_ms: 60000
 
 listeners:
-  - handler: SinkMysqlHandler
-    topic: txn.new
+  - handler: XfersFeesHandler
+    topic: txn.created
     # id of the group that the consumer should join
-    group_id: cg1
+    group_id: cg2
     # Number of threads created for this listener, each thread will behave as an independent consumer.
     # They don't share any state
-    max_concurrency: 1 
+    max_concurrency: 1
     # Once the consumer group has checkpointed its progress in the topic's partitions,
     # the consumers will always start from the checkpointed offsets, regardless of config
     # As such, this setting only applies when the consumer initially starts consuming from a topic
-    start_from_beginning: false
+    start_from_beginning: true
     # maximum amount of data fetched from a single partition at a time
     max_bytes_per_partition: 524288 # 512 KB
     # Minimum number of bytes to read before returning messages from the server; if `max_wait_time` is reached, this is ignored.
     min_bytes: 1
     # Maximum duration of time to wait before returning messages from the server, in seconds
-    max_wait_time: 60000 
+    max_wait_time: 5
     # Apply this encoding to the message payload, if blank it uses the original encoding. This property accepts values
     # defined by the ruby Encoding class (https://ruby-doc.org/core-2.3.0/Encoding.html). Ex: UTF_8, ASCII_8BIT, etc
     force_encoding:
@@ -118,6 +118,10 @@ listeners:
     #     instead of Phobos::Handler so that you can make use of the `consume_batch` etc. methods.
     # Note: Ultimately commit/heartbeart will depend on the offset commit options and the heartbeat interval.
     delivery: message
+    # Use this if custom backoff is required for a listener
+    backoff:
+      min_ms: 500
+      max_ms: 10000
     # session_timeout, offset_commit_interval, offset_commit_threshold, offset_retention_time, and heartbeat_interval
     # can be customized per listener if desired
     session_timeout: 30

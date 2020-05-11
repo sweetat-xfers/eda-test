@@ -1,7 +1,5 @@
 class TxnsController < ApplicationController
   before_action :set_txn, only: [:show, :edit, :update ]
-  skip_before_action :verify_authenticity_token
-
   include Phobos::Producer
 
   # GET /txns
@@ -41,10 +39,12 @@ class TxnsController < ApplicationController
         @txn = Txn.create!(txn_params)
         EventFiringJob.perform_async(@txn.id, "check")
       else
-        self.producer.publish(
-          topic: 'txn.created',
-          payload: @txn.to_json,
-        )
+        if txn.save
+          self.producer.publish(
+            topic: 'txn.created',
+            payload: @txn.to_json,
+          )
+        end
       end
 
       format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
@@ -57,14 +57,30 @@ class TxnsController < ApplicationController
   def update
     respond_to do |format|
       if @txn.update(txn_params)
-        format.html { redirect_to @txn, notice: 'Txn was successfully updated.' }
-        format.json { render :show, status: :ok, location: @txn }
+        format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
+        format.json { render :show, status: :created, location: @txn }
       else
-        format.html { render :edit }
+        @txn_type_list = TxnType.all
+        @bank_list = Bank.all
+        format.html { render :new }
         format.json { render json: @txn.errors, status: :unprocessable_entity }
       end
     end
   end
+
+  # PATCH/PUT /txns/1
+  # PATCH/PUT /txns/1.json
+  # def update
+  #   respond_to do |format|
+  #     if @txn.update(txn_params)
+  #       format.html { redirect_to @txn, notice: 'Txn was successfully updated.' }
+  #       format.json { render :show, status: :ok, location: @txn }
+  #     else
+  #       format.html { render :edit }
+  #       format.json { render json: @txn.errors, status: :unprocessable_entity }
+  #     end
+  #   end
+  # end
 
   # DELETE /txns/1
   # DELETE /txns/1.json

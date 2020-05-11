@@ -7,6 +7,7 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
       zeitwerk (~> 2.2, >= 2.2.2)
+    byebug (11.1.3)
     concurrent-ruby (1.1.6)
     concurrent-ruby-ext (1.1.6)
       concurrent-ruby (= 1.1.6)
@@ -28,6 +29,9 @@ GEM
       logging
       ruby-kafka
       thor
+    rake (13.0.1)
+    ruby-debug-ide (0.7.2)
+      rake (>= 0.8.1)
     ruby-kafka (1.0.0)
       digest-crc
     thor (1.0.1)
@@ -40,7 +44,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  byebug
   phobos
+  ruby-debug-ide
 
 RUBY VERSION
    ruby 2.7.1p83

@@ -14,3 +14,7 @@ gem 'activerecord'
 # https://github.com/phobos/phobos_prometheus
 # gem 'phobos_prometheus'
 
+group :development, :test do
+    gem 'ruby-debug-ide'
+    gem 'debase'
+end
