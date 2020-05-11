@@ -5,7 +5,12 @@ ruby '2.7.1'
 
 # 20200502
 # https://github.com/phobos/phobos
-gem 'phobos'
+#gem 'phobos'
+
+# 20200511
+# https://github.com/zendesk/delivery_boy
+gem 'delivery_boy'
+
 # No description on how this should be run as part of a rails app
 # https://github.com/phobos/phobos_prometheus
 # gem 'phobos_prometheus'

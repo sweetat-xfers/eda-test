@@ -62,5 +62,4 @@ Rails.application.configure do
 
   config.web_console.whitelisted_ips = ['10.0.0.0/8', '127.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16']
 
-  Phobos.configure('config/phobos.yml')
 end

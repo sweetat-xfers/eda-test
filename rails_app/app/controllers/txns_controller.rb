@@ -1,6 +1,5 @@
 class TxnsController < ApplicationController
-  before_action :set_txn, only: [:show, :edit, :update ]
-  include Phobos::Producer
+  before_action :set_txn, only: [:show ]
 
   # GET /txns
   # GET /txns.json
@@ -39,11 +38,11 @@ class TxnsController < ApplicationController
         @txn = Txn.create!(txn_params)
         EventFiringJob.perform_async(@txn.id, "check")
       else
-        if txn.save
-          self.producer.publish(
-            topic: 'txn.created',
-            payload: @txn.to_json,
-          )
+        if @txn.save
+          DeliveryBoy.deliver(@txn.to_json, topic: 'txn.created')
+          # DeliveryBoy.deliver_async(@txn.to_json, topic: 'txn.created')
+          # DeliveryBoy.produce(@txn.to_json, topic: 'txn.created')
+          # DeliveryBoy.deliver_messages
         end
       end
 
