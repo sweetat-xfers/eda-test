@@ -19,16 +19,18 @@ docker-compose up -d
 docker-compose logs --follow
 ```
 
+Go to [test](http://localhost:3000/txns)
+
 For redis test
+
 ```bash
 git clone https://github.com/sweetat-xfers/eda-test.git
 cd eda-test
-docker-compose -f redis-docker-compose.yml build
-docker-compose -f redis-docker-compose.yml up -d
-docker-compose -f redis-docker-compose.yml web run bundle exec rake db:migrate:reset 
-docker-compose -f redis-docker-compose.yml web run bundle exec rake db:seed
+docker-compose -f redis-docker-compose.yml up -d --build
+docker-compose -f redis-docker-compose.yml web run bundle exec rake db:migrate:reset db:seed
 ```
-Go to localhost:3000/sidekiq
+
+Go to [test](http://localhost:3000/sidekiq)
 
 ## Educational Text
 
@@ -64,17 +66,20 @@ Current mediator in Xfers rails application is the Contract class.
 We will share the voting on the comparison of the above on the following characteristics:
 
 1. Agility
-  1.1 Ability to add new workflows, new business product offerings
+    1. Ability to add new workflows
+    2. New business product offerings
 2. Scalability
-  2.1 1,000 txns per second
+    1. 1,000 txns per second
 3. Appropriate Coupling
-  3.1 Domain objects do not depend on classes from a different domain
-  3.2 Agility improved by very loose coupling
+    1. Domain objects do not depend on classes from a different domain
+    2. Agility improved by very loose coupling
 4. Maintainability
-  4.1 Developers know how to read the code quickly
+    1. Developers know how to read the code quickly
 5. Reliability
-  5.1 Shutdown of infrastructure components do not render business service failure
-  5.2 Recovery from failure (ambiguous target)
+    1. Shutdown of infrastructure components do not render business service failure
+    2. Recovery from failure (ambiguous target)
+6. Performance
+    1. Events should complete within specific time
 
 ### Workflow
 
@@ -93,10 +98,10 @@ To compare, the 2 systems will perform the following sets of functions:
 
 #### Stream1: Transaction
 
-1 Save transaction in persistence store
+1. Save transaction in persistence store
 2. Parallel processing
-  2.1 Perform pre-trade check (eg. check if user balance is sufficient)
-  2.2 Calculate Xfers fees for transaction
+    1. Perform pre-trade check (eg. check if user balance is sufficient)
+    2. Calculate Xfers fees for transaction
 3. Fire Bank transaction against Mock service that has 50% failure rate
 4. Save processed bank transaction
 
@@ -104,12 +109,12 @@ To compare, the 2 systems will perform the following sets of functions:
 
 1. Read CSV file from directory or simple curl upload file
 2. Parallel processing
-  1.1 Save data in persistence store
-  1.2 Extract each bank row, and fire bank_row events
+    1. Save data in persistence store
+    2. Extract each bank row, and fire bank_row events
 
 #### Stream3: BankRow event
 
 1. Parallel processing
-  1.1 Save bank row in persistence store (?? do we need to do this? we saved raw csv earlier?)
-  1.2 Interpret Bank Row
+    1. Save bank row in persistence store (?? do we need to do this? we saved raw csv earlier?)
+    2. Interpret Bank Row
 2. Link Txn with Bank Row, and mark as reconciled
