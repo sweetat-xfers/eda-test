@@ -1,9 +1,8 @@
 require "json"
-require "phobos"
+require "racecar"
 
-class XfersFeesHandler
-    include Phobos::Handler
-    include Phobos::Producer
+class XfersFeesConsumer < Racecar::Consumer
+    subscribes_to "txn.created", start_from_beginning: false
 
     @@fee_percent 
 
@@ -15,26 +14,28 @@ class XfersFeesHandler
         raise StandardError.new "self.start(#{fee_percent_str}).invalid"
     end
 
-    def consume(payload, _metadata)
-        Phobos.logger.info("consume.(#{payload}).(#{_metadata})")
+    def process(message)
+        puts("process.(#{message})")
         # Parse JSON
-        txn = JSON.parse(payload)
-        Phobos.logger.info("txn.(#{txn["amt"].to_f})")
-        amt = txn["amt"].to_f
+        txn = JSON.parse(message.value)
+        amt = txn.fetch("amt", "0.0").to_f
+        puts("amt.(#{amt})")
 
         xfers_fees = amt * @@fee_percent
 
-        payload_hash = Hash[
+        payload = Hash[
             "id" => txn["id"],
             "amt" => amt,
             "xfers_fee" => xfers_fees,
-        ]
-        payload = payload_hash.to_json
+        ].to_json
 
-        producer.async_publish(
+        produce(
             topic: "txn.xfers_fees", 
             payload: "#{payload}",
+            key: message.key,
             )
-        Phobos.logger.info("txn.xfers_fees.(#{payload})")
+        puts("txn.xfers_fees.(#{payload})")
+    rescue Exception => e
+        puts "Failed to process message in #{message.topic}/#{message.partition} at offset #{message.offset}: #{e}"
     end
   end
