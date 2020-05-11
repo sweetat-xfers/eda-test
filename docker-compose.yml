@@ -33,6 +33,9 @@ services:
             BUNDLE_JOBS: 4
             BUNDLE_RETRY: 3
             DEBIAN_FRONTEND: noninteractive
+            DELIVERY_BOY_CLIENT_ID: ruby
+            DELIVERY_BOY_BROKERS: broker1:9091,broker2:9092,broker3:9093
+            DELIVERY_BOY_COMPRESSION_CODEC: gzip
         working_dir: /xfers
         tmpfs: /xfers/tmp
         command: >
@@ -300,6 +303,10 @@ services:
             - /usr/local/bundle
         environment:
             RUBYOPT: '-W:no-deprecated -W:no-experimental'
+            RACECAR_BROKERS: broker1:9091,broker2:9092,broker3:9093
+            RACECAR_CLIENT_ID: cg2
+            RACECAR_GROUP_ID_PREFIX: cg2
+            RACECAR_PRODUCER_COMPRESSION_CODEC: gzip
             BUNDLE_JOBS: 4
             BUNDLE_RETRY: 3
         working_dir: /xfers
@@ -318,41 +325,43 @@ services:
                     --host 0.0.0.0 \
                     --port 3102 \
                     --dispatcher-port 3102 \
-                    -- /usr/local/bin/bundle exec phobos start"
-    cg3:
-        image: ruby:latest
-        depends_on:
-            - mysql
-            - zookeeper1
-            # - zookeeper2
-            - broker1
-            # - broker2
-            # - broker3
-        ports:
-            - 3103:3103
-        volumes:
-            - ./kafka/cg3-xfersfees:/xfers:cached
-            - /usr/local/bundle
-        environment:
-            RUBYOPT: '-W:no-deprecated -W:no-experimental'
-            BUNDLE_JOBS: 4
-            BUNDLE_RETRY: 3
-        working_dir: /xfers
-        command: >
-            /bin/bash -c " \
-                echo '##################################################' \
-                && echo 'Gem install Bundler' \
-                && gem install bundler \
-                && echo '##################################################' \
-                && echo 'Install Bundle' \
-                && bundle install \
-                    --with=development \
-                && echo '##################################################' \
-                && echo 'Running rdebug ide' \
-                && bundle exec rdebug-ide \
-                    --host 0.0.0.0 \
-                    --port 3103 \
-                    --dispatcher-port 3103 \
-                    -- /usr/local/bin/bundle exec phobos start"
+                    -- /usr/local/bin/bundle exec racecar \
+                        --require pre_trade_checks_consumer \
+                        PreTradeChecksConsumer"
+    # cg3:
+    #     image: ruby:latest
+    #     depends_on:
+    #         - mysql
+    #         - zookeeper1
+    #         # - zookeeper2
+    #         - broker1
+    #         # - broker2
+    #         # - broker3
+    #     ports:
+    #         - 3103:3103
+    #     volumes:
+    #         - ./kafka/cg3-xfersfees:/xfers:cached
+    #         - /usr/local/bundle
+    #     environment:
+    #         RUBYOPT: '-W:no-deprecated -W:no-experimental'
+    #         BUNDLE_JOBS: 4
+    #         BUNDLE_RETRY: 3
+    #     working_dir: /xfers
+    #     command: >
+    #         /bin/bash -c " \
+    #             echo '##################################################' \
+    #             && echo 'Gem install Bundler' \
+    #             && gem install bundler \
+    #             && echo '##################################################' \
+    #             && echo 'Install Bundle' \
+    #             && bundle install \
+    #                 --with=development \
+    #             && echo '##################################################' \
+    #             && echo 'Running rdebug ide' \
+    #             && bundle exec rdebug-ide \
+    #                 --host 0.0.0.0 \
+    #                 --port 3103 \
+    #                 --dispatcher-port 3103 \
+    #                 -- /usr/local/bin/bundle exec phobos start"
 volumes:
     my-node_modules:
