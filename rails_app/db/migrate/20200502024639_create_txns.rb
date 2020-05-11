@@ -7,6 +7,7 @@ class CreateTxns < ActiveRecord::Migration[6.0]
       t.references :user, null: false, foreign_key: { to_table: :users }
       t.references :src_bank, null: false, foreign_key: { to_table: :banks } 
       t.references :dst_bank, null: false, foreign_key: { to_table: :banks } 
+      t.string   "aasm_state",                          limit: 191
 
       t.timestamps
     end

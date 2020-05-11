@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 2020_05_02_024639) do
     t.bigint "user_id", null: false
     t.bigint "src_bank_id", null: false
     t.bigint "dst_bank_id", null: false
+    t.string "aasm_state", limit: 191
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["dst_bank_id"], name: "index_txns_on_dst_bank_id"

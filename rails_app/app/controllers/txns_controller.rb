@@ -1,5 +1,7 @@
 class TxnsController < ApplicationController
   before_action :set_txn, only: [:show, :edit, :update ]
+  skip_before_action :verify_authenticity_token
+
   include Phobos::Producer
 
   # GET /txns
@@ -27,16 +29,24 @@ class TxnsController < ApplicationController
   # POST /txns
   # POST /txns.json
   def create
-    @txn = Txn.new(txn_params)
-    @txn.txn_status_id = 1
-    @txn.user_id = 1
+    unless ENV["IS_SIDEKIQ"]
+      @txn = Txn.new(txn_params)
+      @txn.txn_status_id = 1
+      @txn.user_id = 1
+    end
 
     respond_to do |format|
       ## Need to check for validity
-      self.producer.publish(
-        topic: 'txn.created',
-        payload: @txn.to_json,
-      )
+      if ENV["IS_SIDEKIQ"]
+        @txn = Txn.create!(txn_params)
+        EventFiringJob.perform_async(@txn.id, "check")
+      else
+        self.producer.publish(
+          topic: 'txn.created',
+          payload: @txn.to_json,
+        )
+      end
+
       format.html { redirect_to @txn, notice: 'Txn was successfully created.' }
       format.json { render :show, status: :created, location: @txn }
     end

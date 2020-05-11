@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+    mysql:
+        image: mysql:5
+        ports:
+            - 3307:3306
+        environment:
+            MYSQL_DATABASE: redistest
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_USER: xfers
+            MYSQL_PASSWORD: password
+    redis:
+        image: redis:latest
+        ports:
+            - 6379:6379
+    web:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - 3000:3000
+        command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0' -e ${RAILS_ENV}"
+        depends_on:
+            - mysql
+        volumes:
+            - ./rails_app:/rails_app
+        environment:
+            DATABASE_URL: mysql2://xfers:password@mysql:3306/redistest
+            NODE_ENV: development
+            RAILS_ENV: development
+            REDIS_URL: redis://redis:6379/
+            IS_SIDEKIQ: "true"
+    sidekiq:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: bundle exec sidekiq -t 25
+        volumes:
+            - ./rails_app:/rails_app
+        depends_on:
+            - mysql
+            - redis
+        environment:
+            DATABASE_URL: mysql2://xfers:password@mysql:3306/redistest
+            RAILS_ENV: development
+            REDIS_URL: redis://redis:6379/

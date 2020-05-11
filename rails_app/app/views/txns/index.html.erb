@@ -16,6 +16,7 @@
         <th>Src Bank</th>
         <th>Dst Bank</th>
         <th>Amt</th>
+        <th>AASM</th>
       </tr>
       </thead>
       <tbody>
@@ -38,6 +39,7 @@
           <td><%= txn.src_bank.name %></td>
           <td><%= txn.dst_bank.name %></td>
           <td><%= txn.amt %></td>
+          <td><%= txn.aasm_state %></td>
         </tr>
       <% end %>
       </tbody>

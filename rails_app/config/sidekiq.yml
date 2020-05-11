@@ -1,0 +1,7 @@
+---
+:concurrency: 25
+:logfile: ./log/sidekiq.log
+:pidfile: ./tmp/sidekiq.pid
+:max_retries: 0
+# :queues:
+#     - cm_event_firing
