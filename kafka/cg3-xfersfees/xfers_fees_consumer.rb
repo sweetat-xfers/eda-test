@@ -6,7 +6,7 @@ class XfersFeesConsumer < Racecar::Consumer
 
     @@fee_percent 
 
-    def self.start(kafka_client)
+    def initialize
         fee_percent_str = ENV["FEE_PERCENT"] ||= "5.0"
         @@fee_percent = fee_percent_str.to_f
         Phobos.logger.info("fee_percent.(#{@@fee_percent})")
