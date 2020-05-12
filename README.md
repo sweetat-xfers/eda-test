@@ -80,6 +80,13 @@ We will share the voting on the comparison of the above on the following charact
     2. Recovery from failure (ambiguous target)
 6. Performance
     1. Events should complete within specific time
+    2. Time taken to handle events in processor
+7. Guaranteed Ordering
+    1. Ordering of events based on event time
+8. Exactly Once Semantics
+    1. Exactly Once Semantics - only one transaction executes
+9. Transition Time
+    1. Smoothness of path to transition to new stack
 
 ### Workflow
 
@@ -90,6 +97,7 @@ To compare, the 2 systems will perform the following sets of functions:
 1. User requests a transaction via Rails
 2. Rails passes the transaction into the technology stack
 3. Rails replies to user that transaction is currently processing
+    1. Some merchants want transactions to complete immediately
 
 #### Reporting
 
@@ -108,6 +116,8 @@ To compare, the 2 systems will perform the following sets of functions:
 #### Stream2: Bank Recon
 
 1. Read CSV file from directory or simple curl upload file
+    1. @victor mentioned that we need an ability to handle situation where data needs
+       to be edited.  Eg. CSV file has 1 bank_row, and bank_row disappears half an hour later
 2. Parallel processing
     1. Save data in persistence store
     2. Extract each bank row, and fire bank_row events
