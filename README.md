@@ -110,7 +110,9 @@ To compare, the 2 systems will perform the following sets of functions:
 2. Parallel processing
     1. Perform pre-trade check (eg. check if user balance is sufficient)
     2. Calculate Xfers fees for transaction
-3. Fire Bank transaction against Mock service that has 50% failure rate
+3. Fire Bank instruction against Mock service that has 50% failure rate
+    1. If bank instruction fails, DO NOT retry
+    2. Mark bank instruction tried - in production system it is "Paid"
 4. Save processed bank transaction
 
 #### Stream2: Bank Recon
