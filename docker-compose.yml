@@ -1,86 +1,86 @@
 version: "3.7"
 services:
-    mysql:
-        image: mysql:5
-        ports:
-            - 3306:3306
-        environment:
-            MYSQL_DATABASE: edatest
-            MYSQL_ROOT_PASSWORD: password
-            MYSQL_USER: xfers
-            MYSQL_PASSWORD: password
+    # mysql:
+    #     image: mysql:5
+    #     ports:
+    #         - 3306:3306
+    #     environment:
+    #         MYSQL_DATABASE: edatest
+    #         MYSQL_ROOT_PASSWORD: password
+    #         MYSQL_USER: xfers
+    #         MYSQL_PASSWORD: password
     # redis:
     #     image: redis:latest
     #     ports:
     #         - 6379:6379
-    ruby:
-        image: ruby:latest
-        ports:
-            - 3000:3000
-            - 3035:3035
-        depends_on:
-            - mysql
-        volumes:
-            - ./rails_app:/xfers:cached
-            - /usr/local/bundle
-            - my-node_modules:/xfers/node_modules
-        environment:
-            DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
-            NODE_ENV: development
-            RAILS_ENV: development
-            RUBYOPT: '-W:no-deprecated -W:no-experimental'
-            REDIS_URL: redis://redis:6379/
-            BUNDLE_JOBS: 4
-            BUNDLE_RETRY: 3
-            DEBIAN_FRONTEND: noninteractive
-            DELIVERY_BOY_CLIENT_ID: ruby
-            DELIVERY_BOY_BROKERS: broker1:9091,broker2:9092,broker3:9093
-            DELIVERY_BOY_COMPRESSION_CODEC: gzip
-        working_dir: /xfers
-        tmpfs: /xfers/tmp
-        command: >
-            /bin/bash -c "
-                echo '##################################################' \
-                && echo 'Install nodejs' \
-                && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-                && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-                && echo 'deb http://dl.yarnpkg.com/debian/ stable main' \
-                    > /etc/apt/sources.list.d/yarn.list \
-                && apt-get -qq update \
-                && apt-get -yq dist-upgrade \
-                && apt-get -yq install --no-install-recommends \
-                    ca-certificates \
-                    curl \
-                    git \
-                    nodejs \
-                    rsync \
-                    tzdata \
-                    yarn \
-                && apt-get clean \
-                && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-                && truncate -s 0 /var/log/*log \
-                && echo '##################################################' \
-                && echo 'Gem Update' \
-                && gem update --system \
-                && echo '##################################################' \
-                && echo 'Gem Install Bundler Foreman' \
-                && gem install bundler foreman \
-                && echo '##################################################' \
-                && echo 'Yarn Install' \
-                && yarn install \
-                && echo '##################################################' \
-                && echo 'Bundle Install' \
-                && time bundle install \
-                    --with=development \
-                    --without=test \
-                && echo '##################################################' \
-                && echo 'Bundle Rake' \
-                    && time bundle exec \
-                      rake db:migrate:reset \
-                            db:seed \
-                && echo '##################################################' \
-                && echo 'Run Foreman' \
-                && foreman start"
+    # ruby:
+    #     image: ruby:latest
+    #     ports:
+    #         - 3000:3000
+    #         - 3035:3035
+    #     depends_on:
+    #         - mysql
+    #     volumes:
+    #         - ./rails_app:/xfers:cached
+    #         - /usr/local/bundle
+    #         - my-node_modules:/xfers/node_modules
+    #     environment:
+    #         DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
+    #         NODE_ENV: development
+    #         RAILS_ENV: development
+    #         RUBYOPT: '-W:no-deprecated -W:no-experimental'
+    #         REDIS_URL: redis://redis:6379/
+    #         BUNDLE_JOBS: 4
+    #         BUNDLE_RETRY: 3
+    #         DEBIAN_FRONTEND: noninteractive
+    #         DELIVERY_BOY_CLIENT_ID: ruby
+    #         DELIVERY_BOY_BROKERS: broker1:9091,broker2:9092,broker3:9093
+    #         DELIVERY_BOY_COMPRESSION_CODEC: gzip
+    #     working_dir: /xfers
+    #     tmpfs: /xfers/tmp
+    #     command: >
+    #         /bin/bash -c "
+    #             echo '##################################################' \
+    #             && echo 'Install nodejs' \
+    #             && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    #             && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    #             && echo 'deb http://dl.yarnpkg.com/debian/ stable main' \
+    #                 > /etc/apt/sources.list.d/yarn.list \
+    #             && apt-get -qq update \
+    #             && apt-get -yq dist-upgrade \
+    #             && apt-get -yq install --no-install-recommends \
+    #                 ca-certificates \
+    #                 curl \
+    #                 git \
+    #                 nodejs \
+    #                 rsync \
+    #                 tzdata \
+    #                 yarn \
+    #             && apt-get clean \
+    #             && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    #             && truncate -s 0 /var/log/*log \
+    #             && echo '##################################################' \
+    #             && echo 'Gem Update' \
+    #             && gem update --system \
+    #             && echo '##################################################' \
+    #             && echo 'Gem Install Bundler Foreman' \
+    #             && gem install bundler foreman \
+    #             && echo '##################################################' \
+    #             && echo 'Yarn Install' \
+    #             && yarn install \
+    #             && echo '##################################################' \
+    #             && echo 'Bundle Install' \
+    #             && time bundle install \
+    #                 --with=development \
+    #                 --without=test \
+    #             && echo '##################################################' \
+    #             && echo 'Bundle Rake' \
+    #                 && time bundle exec \
+    #                   rake db:migrate:reset \
+    #                         db:seed \
+    #             && echo '##################################################' \
+    #             && echo 'Run Foreman' \
+    #             && foreman start"
     zookeeper1:
         image: confluentinc/cp-zookeeper:5.5.0
         volumes:
@@ -122,6 +122,7 @@ services:
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
             KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker1:9091,PLAINTEXT_HOST://localhost:19092
             KAFKA_JMX_OPTS: -javaagent:/etc/jmx-exporter/jmx_prometheus_javaagent-0.12.0.jar=7071:/etc/jmx-exporter/kafka-2_0_0.yml
+            CONFLUENT_METRICS_ENABLE: "false"
             # Set this only if there is only one broker running
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     # broker2:
@@ -190,36 +191,6 @@ services:
     #         GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     #         GF_REMOTE_CACHE_TYPE: redis
     #         GF_REMOTE_CACHE_CONNSTR: addr=redis:6379
-    # datagen:
-    #     image: cnfldemos/kafka-connect-datagen:0.3.1-5.4.1
-    #     depends_on:
-    #         - zookeeper1
-    #         - zookeeper2
-    #         - broker1
-    #         - broker2
-    #         - broker3
-    #     ports:
-    #         - 8083:8083
-    #     environment:
-    #         CONNECT_BOOTSTRAP_SERVERS: broker1:9091,broker2:9092,broker3:9093
-    #         CONNECT_REST_ADVERTISED_HOST_NAME: datagen
-    #         CONNECT_REST_PORT: 8083
-    #         CONNECT_GROUP_ID: compose-connect-group
-    #         CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
-    #         CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
-    #         CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
-    #         CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
-    #         CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
-    #         CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
-    #         CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-    #         CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-    #         CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-    #         CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:6000
-    #         CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-    #         CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-    #         CONNECT_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2182
-    #         CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
-    #         CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
     # schema-registry:
     #     image: confluentinc/cp-schema-registry:5.5.0
     #     depends_on:
@@ -287,47 +258,47 @@ services:
     #                 --port 3101 \
     #                 --dispatcher-port 3101 \
     #                 -- /usr/local/bin/bundle exec phobos start"
-    cg2:
-        image: ruby:latest
-        depends_on:
-            - mysql
-            - zookeeper1
-            # - zookeeper2
-            - broker1
-            # - broker2
-            # - broker3
-        ports:
-            - 3102:3102
-        volumes:
-            - ./kafka/cg2-pretradecheck:/xfers:cached
-            - /usr/local/bundle
-        environment:
-            RUBYOPT: '-W:no-deprecated -W:no-experimental'
-            RACECAR_BROKERS: broker1:9091,broker2:9092,broker3:9093
-            RACECAR_CLIENT_ID: cg2
-            RACECAR_GROUP_ID_PREFIX: cg2
-            RACECAR_PRODUCER_COMPRESSION_CODEC: gzip
-            BUNDLE_JOBS: 4
-            BUNDLE_RETRY: 3
-        working_dir: /xfers
-        command: >
-            /bin/bash -c " \
-                echo '##################################################' \
-                && echo 'Gem install Bundler' \
-                && gem install bundler \
-                && echo '##################################################' \
-                && echo 'Install Bundle' \
-                && bundle install \
-                    --with=development \
-                && echo '##################################################' \
-                && echo 'Running rdebug ide' \
-                && bundle exec rdebug-ide \
-                    --host 0.0.0.0 \
-                    --port 3102 \
-                    --dispatcher-port 3102 \
-                    -- /usr/local/bin/bundle exec racecar \
-                        --require pre_trade_checks_consumer \
-                        PreTradeChecksConsumer"
+    # cg2:
+    #     image: ruby:latest
+    #     depends_on:
+    #         - mysql
+    #         - zookeeper1
+    #         # - zookeeper2
+    #         - broker1
+    #         # - broker2
+    #         # - broker3
+    #     ports:
+    #         - 3102:3102
+    #     volumes:
+    #         - ./kafka/cg2-pretradecheck:/xfers:cached
+    #         - /usr/local/bundle
+    #     environment:
+    #         RUBYOPT: '-W:no-deprecated -W:no-experimental'
+    #         RACECAR_BROKERS: broker1:9091,broker2:9092,broker3:9093
+    #         RACECAR_CLIENT_ID: cg2
+    #         RACECAR_GROUP_ID_PREFIX: cg2
+    #         RACECAR_PRODUCER_COMPRESSION_CODEC: gzip
+    #         BUNDLE_JOBS: 4
+    #         BUNDLE_RETRY: 3
+    #     working_dir: /xfers
+    #     command: >
+    #         /bin/bash -c " \
+    #             echo '##################################################' \
+    #             && echo 'Gem install Bundler' \
+    #             && gem install bundler \
+    #             && echo '##################################################' \
+    #             && echo 'Install Bundle' \
+    #             && bundle install \
+    #                 --with=development \
+    #             && echo '##################################################' \
+    #             && echo 'Running rdebug ide' \
+    #             && bundle exec rdebug-ide \
+    #                 --host 0.0.0.0 \
+    #                 --port 3102 \
+    #                 --dispatcher-port 3102 \
+    #                 -- /usr/local/bin/bundle exec racecar \
+    #                     --require pre_trade_checks_consumer \
+    #                     PreTradeChecksConsumer"
     # cg3:
     #     image: ruby:latest
     #     depends_on:
@@ -363,5 +334,86 @@ services:
     #                 --port 3103 \
     #                 --dispatcher-port 3103 \
     #                 -- /usr/local/bin/bundle exec phobos start"
+    # datagen:
+    #     image: cnfldemos/kafka-connect-datagen:0.3.1-5.4.1
+    #     depends_on:
+    #         - zookeeper1
+    #         - zookeeper2
+    #         - broker1
+    #         - broker2
+    #         - broker3
+    #     ports:
+    #         - 8083:8083
+    #     environment:
+    #         CONNECT_BOOTSTRAP_SERVERS: broker1:9091,broker2:9092,broker3:9093
+    #         CONNECT_REST_ADVERTISED_HOST_NAME: datagen
+    #         CONNECT_REST_PORT: 8083
+    #         CONNECT_GROUP_ID: compose-connect-group
+    #         CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+    #         CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+    #         CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+    #         CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+    #         CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+    #         CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+    #         CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+    #         CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+    #         CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+    #         CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:6000
+    #         CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+    #         CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+    #         CONNECT_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2182
+    #         CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+    #         CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+    schema-registry:
+        image: confluentinc/cp-schema-registry:5.5.0
+        depends_on:
+            - zookeeper1
+            # - zookeeper2
+            - broker1
+            # - broker2
+            # - broker3
+        ports:
+            - 8081:8081
+        environment:
+            SCHEMA_REGISTRY_HOST_NAME: schema-registry
+            SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper1:2181,zookeeper2:2182
+    connect:
+        image: localhost/kafka-connect-demo:0.0.1
+        build:
+            context: .
+            dockerfile: docker/connect/Dockerfile
+        depends_on:
+            - zookeeper1
+            # - zookeeper2
+            - broker1
+            # - broker2
+            # - broker3
+            - schema-registry
+        volumes:
+            - ./connect-plugins:/connect-plugins
+            - ./spooldir:/spooldir
+        ports:
+            - 8083:8083
+        environment:
+            CONNECT_BOOTSTRAP_SERVERS: broker1:9091,broker2:9092,broker3:9093
+            CONNECT_REST_ADVERTISED_HOST_NAME: connect
+            CONNECT_REST_PORT: 8083
+            CONNECT_GROUP_ID: compose-connect-group
+            CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+            CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+            CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+            CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+            CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+            # CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+            CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+            CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+            CONNECT_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2182
+            CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+            CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
 volumes:
     my-node_modules:
