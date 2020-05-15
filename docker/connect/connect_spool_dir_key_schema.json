@@ -1,0 +1,11 @@
+{
+    "name": "com.example.users.UserKey",
+    "type": "STRUCT",
+    "isOptional": false,
+    "fieldSchemas": {
+        "id": {
+            "type": "INT64",
+            "isOptional": false
+        }
+    }
+}
