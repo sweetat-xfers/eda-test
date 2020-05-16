@@ -11,78 +11,78 @@ services:
             MYSQL_ROOT_PASSWORD: password
             MYSQL_USER: xfers
             MYSQL_PASSWORD: password
-    redis:
-        image: redis:latest
-        ports:
-            - 6379:6379
-    ruby:
-        image: ruby:latest
-        ports:
-            - 3000:3000
-            - 3035:3035
-        depends_on:
-            - mysql
-        volumes:
-            - ./rails_app:/xfers:cached
-            - /usr/local/bundle
-            - my-node_modules:/xfers/node_modules
-        environment:
-            DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
-            NODE_ENV: development
-            RAILS_ENV: development
-            RUBYOPT: '-W:no-deprecated -W:no-experimental'
-            REDIS_URL: redis://redis:6379/
-            BUNDLE_JOBS: 4
-            BUNDLE_RETRY: 3
-            DEBIAN_FRONTEND: noninteractive
-            DELIVERY_BOY_CLIENT_ID: ruby
-            DELIVERY_BOY_BROKERS: broker1:9091,broker2:9092,broker3:9093
-            DELIVERY_BOY_COMPRESSION_CODEC: gzip
-        working_dir: /xfers
-        tmpfs: /xfers/tmp
-        command: >
-            /bin/bash -c "
-                echo '##################################################' \
-                && echo 'Install nodejs' \
-                && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-                && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-                && echo 'deb http://dl.yarnpkg.com/debian/ stable main' \
-                    > /etc/apt/sources.list.d/yarn.list \
-                && apt-get -qq update \
-                && apt-get -yq dist-upgrade \
-                && apt-get -yq install --no-install-recommends \
-                    ca-certificates \
-                    curl \
-                    git \
-                    nodejs \
-                    rsync \
-                    tzdata \
-                    yarn \
-                && apt-get clean \
-                && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-                && truncate -s 0 /var/log/*log \
-                && echo '##################################################' \
-                && echo 'Gem Update' \
-                && gem update --system \
-                && echo '##################################################' \
-                && echo 'Gem Install Bundler Foreman' \
-                && gem install bundler foreman \
-                && echo '##################################################' \
-                && echo 'Yarn Install' \
-                && yarn install \
-                && echo '##################################################' \
-                && echo 'Bundle Install' \
-                && time bundle install \
-                    --with=development \
-                    --without=test \
-                && echo '##################################################' \
-                && echo 'Bundle Rake' \
-                    && time bundle exec \
-                      rake db:migrate:reset \
-                            db:seed \
-                && echo '##################################################' \
-                && echo 'Run Foreman' \
-                && foreman start"
+    # redis:
+    #     image: redis:latest
+    #     ports:
+    #         - 6379:6379
+    # ruby:
+    #     image: ruby:latest
+    #     ports:
+    #         - 3000:3000
+    #         - 3035:3035
+    #     depends_on:
+    #         - mysql
+    #     volumes:
+    #         - ./rails_app:/xfers:cached
+    #         - /usr/local/bundle
+    #         - my-node_modules:/xfers/node_modules
+    #     environment:
+    #         DATABASE_URL: mysql2://xfers:password@mysql:3306/edatest
+    #         NODE_ENV: development
+    #         RAILS_ENV: development
+    #         RUBYOPT: '-W:no-deprecated -W:no-experimental'
+    #         REDIS_URL: redis://redis:6379/
+    #         BUNDLE_JOBS: 4
+    #         BUNDLE_RETRY: 3
+    #         DEBIAN_FRONTEND: noninteractive
+    #         DELIVERY_BOY_CLIENT_ID: ruby
+    #         DELIVERY_BOY_BROKERS: broker1:9091,broker2:9092,broker3:9093
+    #         DELIVERY_BOY_COMPRESSION_CODEC: gzip
+    #     working_dir: /xfers
+    #     tmpfs: /xfers/tmp
+    #     command: >
+    #         /bin/bash -c "
+    #             echo '##################################################' \
+    #             && echo 'Install nodejs' \
+    #             && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    #             && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    #             && echo 'deb http://dl.yarnpkg.com/debian/ stable main' \
+    #                 > /etc/apt/sources.list.d/yarn.list \
+    #             && apt-get -qq update \
+    #             && apt-get -yq dist-upgrade \
+    #             && apt-get -yq install --no-install-recommends \
+    #                 ca-certificates \
+    #                 curl \
+    #                 git \
+    #                 nodejs \
+    #                 rsync \
+    #                 tzdata \
+    #                 yarn \
+    #             && apt-get clean \
+    #             && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    #             && truncate -s 0 /var/log/*log \
+    #             && echo '##################################################' \
+    #             && echo 'Gem Update' \
+    #             && gem update --system \
+    #             && echo '##################################################' \
+    #             && echo 'Gem Install Bundler Foreman' \
+    #             && gem install bundler foreman \
+    #             && echo '##################################################' \
+    #             && echo 'Yarn Install' \
+    #             && yarn install \
+    #             && echo '##################################################' \
+    #             && echo 'Bundle Install' \
+    #             && time bundle install \
+    #                 --with=development \
+    #                 --without=test \
+    #             && echo '##################################################' \
+    #             && echo 'Bundle Rake' \
+    #                 && time bundle exec \
+    #                   rake db:migrate:reset \
+    #                         db:seed \
+    #             && echo '##################################################' \
+    #             && echo 'Run Foreman' \
+    #             && foreman start"
     zookeeper1:
         image: confluentinc/cp-zookeeper:5.5.0
         volumes:
@@ -386,7 +386,8 @@ services:
                 && if [ ! -d /spooldir/in ]; then mkdir /spooldir/in; fi \
                 && if [ ! -d /spooldir/error ]; then mkdir /spooldir/error; fi \
                 && if [ ! -d /spooldir/finished ]; then mkdir /spooldir/finished; fi \
-                && /usr/local/bin/wait-for-it.sh connect:8083 -- \
+                && /usr/local/bin/wait-for-it.sh connect:8083 \
+                    --timeout=0 -- \
                     /bin/bash /connect/datagen/add_bank_rows.sh \
                 && /bin/bash /connect/jdbc/add_xfers_bank_rows.sh"
 
