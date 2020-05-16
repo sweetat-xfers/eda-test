@@ -1,0 +1,63 @@
+{
+  "namespace": "ksql",
+  "name": "BankRows",
+  "doc": "Defines a hypothetical bank row using some known information about bank_rows.",
+  "type": "record",
+  "fields": [
+    {
+      "name": "txn_type",
+      "doc": "A simulated bank information type (disburse or topup)",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [ "CREDIT", "DEBIT"  ]
+        }
+      }
+    },
+    {
+      "name": "amt",
+      "doc": "A simulated random quantity of the trade",
+      "type": {
+        "type": "int",
+        "arg.properties": {
+          "range": {
+            "min": 1000,
+            "max": 10000000
+          }
+        }
+      }
+    },
+    {
+      "name": "timestamp",
+      "doc": "Simulated timestampfor the execution of the transfer",
+      "type": {
+        "type": "long",
+        "format_as_time" : "unix_long",
+        "arg.properties": {
+          "iteration": { "start": 1, "step": 10}
+        }
+      }
+    },
+    {
+      "name": "account",
+      "doc": "Simulated accounts assigned to the trade",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+          "options": [ "ABC123", "LMN456", "XYZ789" ]
+        }
+      }
+    },
+    {
+      "name": "user_id", 
+      "doc": "The simulated user who executed the trade",
+      "type": {
+        "type": "string",
+        "arg.properties": {
+            "regex": "User_[1-9]{0,1}"
+        }
+      }
+    }
+  ]
+}
+
