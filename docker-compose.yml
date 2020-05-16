@@ -4,6 +4,8 @@ services:
         image: mysql:5
         ports:
             - 3306:3306
+        volumes:
+            - ./docker/mysql/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
         environment:
             MYSQL_DATABASE: edatest
             MYSQL_ROOT_PASSWORD: password
@@ -374,14 +376,18 @@ services:
             /bin/sh -c "apk --update-cache add \
                     bash \
                     curl \
+                && curl -o /usr/local/bin/wait-for-it.sh \
+                    https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
                 && chmod 755 /connect/spooldir/add_mockaroo.sh \
                     /connect/datagen/add_stock_trades.sh \
                     /connect/datagen/add_bank_rows.sh \
                     /connect/add_connector.sh \
+                    /usr/local/bin/wait-for-it.sh \
                 && if [ ! -d /spooldir/in ]; then mkdir /spooldir/in; fi \
                 && if [ ! -d /spooldir/error ]; then mkdir /spooldir/error; fi \
                 && if [ ! -d /spooldir/finished ]; then mkdir /spooldir/finished; fi \
-                && /bin/bash /connect/datagen/add_bank_rows.sh \
+                && /usr/local/bin/wait-for-it.sh connect:8083 -- \
+                    /bin/bash /connect/datagen/add_bank_rows.sh \
                 && /bin/bash /connect/jdbc/add_xfers_bank_rows.sh"
 
 volumes:
