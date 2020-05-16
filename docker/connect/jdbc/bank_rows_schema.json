@@ -1,0 +1,27 @@
+{
+  "name": "bankrows",
+  "type": "record",
+  "fields": [
+    {
+      "name": "txn_type",
+      "type": "string"
+    },
+    {
+      "name": "amt",
+      "type": "Decimal"
+    },
+    {
+      "name": "timestamp",
+      "type": "Timestamp"
+    },
+    {
+      "name": "account",
+      "type": "string"
+    },
+    {
+      "name": "user_id", 
+      "type": "string"
+    }
+  ]
+}
+
