@@ -10,12 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_02_024639) do
+ActiveRecord::Schema.define(version: 2020_05_17_131657) do
 
   create_table "banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.decimal "amt", precision: 20, scale: 5
+    t.string "aasm_state", limit: 191
+    t.bigint "type_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "src_bank_id", null: false
+    t.bigint "dst_bank_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["dst_bank_id"], name: "index_transactions_on_dst_bank_id"
+    t.index ["src_bank_id"], name: "index_transactions_on_src_bank_id"
+    t.index ["type_id"], name: "index_transactions_on_type_id"
+    t.index ["user_id"], name: "index_transactions_on_user_id"
   end
 
   create_table "txn_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -52,10 +67,14 @@ ActiveRecord::Schema.define(version: 2020_05_02_024639) do
     t.date "dob"
     t.string "mobile"
     t.string "email"
+    t.decimal "balance", precision: 20, scale: 5
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "transactions", "banks", column: "dst_bank_id"
+  add_foreign_key "transactions", "banks", column: "src_bank_id"
+  add_foreign_key "transactions", "users"
   add_foreign_key "txns", "banks", column: "dst_bank_id"
   add_foreign_key "txns", "banks", column: "src_bank_id"
   add_foreign_key "txns", "txn_statuses"

@@ -27,7 +27,8 @@ For redis test
 git clone https://github.com/sweetat-xfers/eda-test.git
 cd eda-test
 docker-compose -f redis-docker-compose.yml up -d --build
-docker-compose -f redis-docker-compose.yml web run bundle exec rake db:migrate:reset db:seed
+docker-compose -f redis-docker-compose.yml run web bundle exec rake db:migrate:reset db:seed
+docker-compose -f redis-docker-compose.yml run web bundle exec rake db:seed
 ```
 
 Go to [test](http://localhost:3000/sidekiq)

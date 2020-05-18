@@ -9,10 +9,22 @@ services:
             MYSQL_ROOT_PASSWORD: password
             MYSQL_USER: xfers
             MYSQL_PASSWORD: password
+    # redis:
+    #     image: redis:latest
+    #     ports:
+    #         - 6379:6379
     redis:
-        image: redis:latest
+        image: bitnami/redis:latest
+        environment:
+            - ALLOW_EMPTY_PASSWORD=yes
         ports:
-            - 6379:6379
+            - 6379-6381:6379
+    redis-sentinel:
+        image: bitnami/redis-sentinel:latest
+        environment:
+            - REDIS_MASTER_HOST=redis
+        ports:
+            - 26379-26381:26379
     web:
         build:
             context: .
